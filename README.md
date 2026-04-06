@@ -1,50 +1,175 @@
-# Welcome to your Expo app 👋
+# 🎵 GIG Music Player
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+<p align="center">
+  <img src="./assets/images/app_icon.png" width="150" alt="App Icon" style="border-radius: 32px;" />
+</p>
 
-## Get started
+A sleek, modern music streaming app built with **React Native** and **Expo**. GIG Music Player connects to the **Deezer API** to let you search, stream, and organize millions of tracks — all wrapped in a stunning dual-theme UI powered by the **Sonic Noir** design system.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## ✨ Features
 
-2. Start the app
+### 🎧 Music Playback
 
-   ```bash
-   npx expo start
-   ```
+- **Stream 30-second previews** from the Deezer catalog via `expo-av`
+- **Full playback controls** — play, pause, skip, seek with a draggable progress bar
+- **Shuffle & Repeat** modes (off → all → one)
+- **Queue management** — songs are automatically queued from any list you play
+- **Background audio** support (stays active in background & silent mode on iOS)
+- **Mini Player** — persistent, floating mini player across all tabs
 
-In the output, you'll find options to open the app in a
+### 🔍 Search & Discovery
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- **Real-time search** — instant results as you type (songs, artists, albums)
+- **Trending charts** — top tracks from Deezer displayed on the Home screen
+- **Genre browsing** — quick-tap genre cards (Pop, Rock, Hip-Hop, R&B, Electronic, Jazz)
+- **Filter chips** — narrow results by category
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### 📚 Library Management
 
-## Get a fresh project
+- **Songs tab** — browse all available tracks with sort by name or artist
+- **Playlists tab** — create, rename, and delete custom playlists
+- **Favorites tab** — one-tap heart to save/unsave any song
+- **Search within library** — filter your personal collection
 
-When you're ready, run:
+### 👤 User Profile & Settings
 
-```bash
-npm run reset-project
+- **Authentication** — sign up & login with local persistence via `AsyncStorage`
+- **User stats** — favorites count, playlist count, songs played
+- **Dynamic Theme Engine** — instantly toggle between Dark, Light, and System modes
+- **Information Modals** — accessible panels for Privacy Policy, Help & Support, and About info
+
+### 🎨 Design
+
+- **Sonic Noir** dynamic theme with vibrant purple/cyan (`#de8eff`/`#00f4fe`) accents
+- **Gradient accents** — linear gradients on play button, progress bar, and avatar ring
+- **Edge-to-edge** layout on Android with `edgeToEdgeEnabled`
+
+---
+
+## 🏗️ Tech Stack
+
+| Layer            | Technology                                                  |
+| ---------------- | ----------------------------------------------------------- |
+| **Framework**    | React Native 0.81 + Expo SDK 54                             |
+| **Navigation**   | React Navigation 7 (Native Stack & Bottom Tabs)             |
+| **Audio**        | expo-av                                                     |
+| **API**          | Deezer Public API                                           |
+| **State**        | React Context (Auth, Player, Playlist, Theme)               |
+| **Persistence**  | @react-native-async-storage/async-storage                   |
+| **Images**       | expo-image                                                  |
+| **UI Effects**   | expo-linear-gradient, expo-blur, expo-haptics               |
+| **Language**     | TypeScript 5.9                                              |
+| **Architecture** | React New Architecture enabled                              |
+
+---
+
+## 📂 Project Structure
+
+```
+GIG_Music_Player/
+├── screens/                 # All application screens
+│   ├── HomeScreen.tsx       # Home — greeting, recently played, favorites, trending
+│   ├── SearchScreen.tsx     # Search — real-time search, genre browse, filters
+│   ├── LibraryScreen.tsx    # Library — Songs / Playlists / Favorites tabs
+│   ├── ProfileScreen.tsx    # Profile — avatar, theme toggle, info modals, logout
+│   ├── PlaylistDetailScreen.tsx   # Playlist detail — play all, shuffle, song list
+│   ├── CreatePlaylistScreen.tsx   # Create new playlist form
+│   ├── LoginScreen.tsx      # Login screen
+│   ├── SignupScreen.tsx     # Sign-up screen
+│   ├── PlayerScreen.tsx     # Full-screen Now Playing
+│   ├── FavoritesScreen.tsx  # Dedicated favorites screen
+│   └── RecentScreen.tsx     # Recently played history
+├── navigation/
+│   ├── TabNavigator.tsx     # Bottom tab navigator + MiniPlayer overlay
+│   └── types.ts             # TypeScript types for all navigation stacks
+├── components/
+│   ├── MiniPlayer.tsx       # Floating mini player with playback controls
+│   └── SongItem.tsx         # Reusable song row component
+├── contexts/
+│   ├── AuthContext.tsx       # Authentication state & persistence
+│   ├── PlayerContext.tsx     # Audio playback engine & queue state
+│   ├── PlaylistContext.tsx   # Playlists, favorites & persistence
+│   └── ThemeContext.tsx      # Dual-mode theme state (Light/Dark/System)
+├── services/
+│   ├── api.ts               # Deezer API client (search, charts, tracks, artists)
+│   └── types.ts             # TypeScript interfaces (Song, Playlist, User, etc.)
+├── constants/
+│   └── theme.ts             # Sonic Noir design tokens (Light/Dark ColorPalettes)
+├── App.tsx                  # Root component (Providers & Root Navigation)
+└── babel.config.js          # Babel config with strict path aliases (@/ -> ./)
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## 🚀 Getting Started
 
-To learn more about developing your project with Expo, look at the following resources:
+### Prerequisites
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- **Node.js** ≥ 18
+- **npm** or **yarn**
+- **Expo CLI** — installed globally or via `npx`
+- **Android Studio** (for Android emulator) or a physical device with **Expo Go**
 
-## Join the community
+### Installation
 
-Join our community of developers creating universal apps.
+```bash
+# Clone the repository
+git clone https://github.com/your-username/GIG_Music_Player.git
+cd GIG_Music_Player
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+# Install dependencies
+npm install
+
+# Start the development server
+npx expo start
+```
+
+### Running on a Device
+
+| Platform | Command                    |
+| -------- | -------------------------- |
+| Android  | `npx expo start --android` |
+| iOS      | `npx expo start --ios`     |
+| Web      | `npx expo start --web`     |
+
+> **Tip:** Scan the QR code in your terminal with the **Expo Go** app on your phone for the fastest setup.
+
+---
+
+## 🎶 API
+
+GIG Music Player uses the **[Deezer Public API](https://developers.deezer.com/api)** — no API key required.
+
+| Endpoint               | Usage                    |
+| ---------------------- | ------------------------ |
+| `GET /search?q=`       | Search songs by query    |
+| `GET /chart/0/tracks`  | Fetch trending tracks    |
+| `GET /track/{id}`      | Get single track details |
+| `GET /artist/{id}/top` | Get artist's top tracks  |
+
+---
+
+## 🎨 Design System — Sonic Noir
+
+| Token        | Description                                               |
+| ------------ | --------------------------------------------------------- |
+| Philosophy   | A stark, premium two-tone system                          |
+| Themes       | Supported `light` and `dark` with automatic OS sync       |
+| Primary      | `#de8eff` (vibrant purple)                                |
+| Secondary    | `#00f4fe` (electric cyan)                                 |
+| Typography   | System default native fonts                               |
+| Corner Radii | Pill-drops to soft squares                                |
+
+---
+
+## 📄 License
+
+This project is private and not licensed for public distribution.
+
+---
+
+<p align="center">
+  Built with ❤️ using React Native & Expo
+</p>
