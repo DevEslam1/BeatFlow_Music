@@ -133,6 +133,9 @@ GIG_Music_Player/
 ├── constants/
 │   └── theme.ts             # Sonic Noir design tokens (Light/Dark ColorPalettes)
 ├── App.tsx                  # Root component (Providers & Root Navigation)
+├── hooks/                   # Custom hooks for theme and system integration
+│   ├── use-color-scheme.ts  # Standardizes OS color scheme access
+│   └── use-theme-color.ts   # Bridges custom GIG palette with template components
 └── babel.config.js          # Babel config with strict path aliases (@/ -> ./)
 ```
 
