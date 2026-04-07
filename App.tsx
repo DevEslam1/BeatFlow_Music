@@ -10,8 +10,9 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { PlayerProvider } from '@/contexts/PlayerContext';
 import { PlaylistProvider } from '@/contexts/PlaylistContext';
 import { NetworkProvider } from '@/contexts/NetworkContext';
+import { LocalTracksProvider } from '@/contexts/LocalTracksContext';
 import { AuthStackParamList, MainStackParamList } from '@/navigation/types';
-import TabNavigator from '@/navigation/TabNavigator';
+import DrawerNavigator from '@/navigation/DrawerNavigator';
 import LoginScreen from '@/screens/LoginScreen';
 import SignupScreen from '@/screens/SignupScreen';
 import PlayerScreen from '@/screens/PlayerScreen';
@@ -52,7 +53,7 @@ function MainNavigator() {
         gestureEnabled: true,
       }}
     >
-      <MainStack.Screen name="HomeTabs" component={TabNavigator} />
+      <MainStack.Screen name="HomeDrawer" component={DrawerNavigator} />
       <MainStack.Screen
         name="Player"
         component={PlayerScreen}
@@ -120,9 +121,11 @@ export default function App() {
         <NetworkProvider>
         <AuthProvider>
           <PlaylistProvider>
-            <PlayerProvider>
-              <AppNavigator />
-            </PlayerProvider>
+            <LocalTracksProvider>
+              <PlayerProvider>
+                <AppNavigator />
+              </PlayerProvider>
+            </LocalTracksProvider>
           </PlaylistProvider>
         </AuthProvider>
       </NetworkProvider>

@@ -28,6 +28,13 @@ A sleek, modern music streaming app built with **React Native** and **Expo**. GI
 - **Staggered Animations** — Song list items slide in with a fluid, staggered entrance effect
 - **Full-Screen Gestures** — Swipe down from anywhere on the player to minimize it back to the bar
 
+### 🗺️ Navigation & Sidebar
+
+- **Drawer Navigation** — A premium sidebar menu (Drawer) for high-level app navigation.
+- **Custom Branded Sidebar** — Featuring user profile details (avatar, name, email) and app branding.
+- **Dynamic Toggle** — Hamburger menu icon integrated into all main screen headers for easy sidebar access.
+- **Composite Routing** — Seamlessly combines Drawer navigation with existing Bottom Tabs for a professional feel.
+
 
 
 
@@ -45,6 +52,14 @@ A sleek, modern music streaming app built with **React Native** and **Expo**. GI
 - **Favorites tab** — one-tap heart to save/unsave any song
 - **Downloads tab** — acts as your local hub for all saved offline music
 - **Search within library** — filter your personal collection
+
+### 📁 Local Media Library
+
+- **Automatic Media Scanning** — Scans your device for local `.mp3` and audio files via `expo-media-library`.
+- **Smart Classification** — Automatically organizes your local music into **Songs**, **Artists**, **Albums**, and **Folders**.
+- **Offline Playback** — Play your personal local files without needing an internet connection.
+- **Seamless Integration** — Local tracks work with the same player controls and mini-player as streamed tracks.
+- **Permission Management** — Built-in support for requesting and handling device storage permissions.
 
 ### 👤 User Profile & Settings
 
@@ -80,9 +95,9 @@ A sleek, modern music streaming app built with **React Native** and **Expo**. GI
 | Layer            | Technology                                                  |
 | ---------------- | ----------------------------------------------------------- |
 | **Framework**    | React Native 0.81 + Expo SDK 54                             |
-| **Navigation**   | React Navigation 7 (Native Stack & Bottom Tabs)             |
+| **Navigation**   | React Navigation 7 (Native Stack, Bottom Tabs, Drawer)       |
 | **Animations**   | react-native-reanimated                                     |
-| **Audio**        | expo-av                                                     |
+| **Audio**        | expo-av, expo-media-library                                 |
 
 | **API**          | Deezer Public API                                           |
 | **State**        | React Context (Auth, Player, Playlist, Theme, Network)      |
@@ -107,6 +122,7 @@ GIG_Music_Player/
 │   ├── HomeScreen.tsx       # Home — greeting, recently played, favorites, trending
 │   ├── SearchScreen.tsx     # Search — real-time search, genre browse, filters
 │   ├── LibraryScreen.tsx    # Library — Songs / Playlists / Favorites tabs
+│   ├── LocalTracksScreen.tsx # Local Library — classified local audio assets
 │   ├── ProfileScreen.tsx    # Profile — avatar, theme toggle, info modals, logout
 │   ├── PlaylistDetailScreen.tsx   # Playlist detail — play all, shuffle, song list
 │   ├── CreatePlaylistScreen.tsx   # Create new playlist form
@@ -116,6 +132,7 @@ GIG_Music_Player/
 │   ├── FavoritesScreen.tsx  # Dedicated favorites screen
 │   └── RecentScreen.tsx     # Recently played history
 ├── navigation/
+│   ├── DrawerNavigator.tsx  # Main sidebar navigator wrapping the app
 │   ├── TabNavigator.tsx     # Bottom tab navigator + MiniPlayer overlay
 │   └── types.ts             # TypeScript types for all navigation stacks
 ├── components/
@@ -123,6 +140,7 @@ GIG_Music_Player/
 │   └── SongItem.tsx         # Reusable song row component
 ├── contexts/
 │   ├── AuthContext.tsx       # Authentication state & persistence
+│   ├── LocalTracksContext.tsx # Local device media scanning & classification
 │   ├── NetworkContext.tsx    # Connection state & offline checks
 │   ├── PlayerContext.tsx     # Audio playback engine & queue state
 │   ├── PlaylistContext.tsx   # Playlists, favorites, downloads & persistence

@@ -6,6 +6,7 @@ import {
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { Spacing, Radii, FontSizes, ColorPalette } from '@/constants/theme';
@@ -68,7 +69,10 @@ export default function HomeScreen() {
   return (
     <ScrollView style={s.container} contentContainerStyle={[s.contentContainer, { paddingTop: insets.top + Spacing.sm }]}>
       <View style={s.header}>
-        <View>
+        <TouchableOpacity style={s.menuButton} onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={28} color={colors.onSurface} />
+        </TouchableOpacity>
+        <View style={{ flex: 1, marginLeft: Spacing.md }}>
           <Text style={s.greeting}>{greeting()}</Text>
           <Text style={s.userName}>{user?.name ?? 'Music Lover'}</Text>
         </View>
@@ -179,6 +183,7 @@ const makeStyles = (c: ColorPalette) => StyleSheet.create({
   container: { flex: 1, backgroundColor: c.background },
   contentContainer: { paddingBottom: 140 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: Spacing.xl, marginBottom: Spacing['2xl'] },
+  menuButton: { width: 44, height: 44, borderRadius: Radii.full, backgroundColor: c.surfaceContainer, justifyContent: 'center', alignItems: 'center' },
   greeting: { color: c.onSurfaceVariant, fontSize: FontSizes.bodyMd },
   userName: { color: c.onSurface, fontSize: FontSizes.headlineMd, fontWeight: '700' },
   notifButton: { width: 44, height: 44, borderRadius: Radii.full, backgroundColor: c.surfaceContainer, justifyContent: 'center', alignItems: 'center' },

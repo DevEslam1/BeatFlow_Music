@@ -6,6 +6,8 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { searchSongs } from "@/services/api";
 import { Song } from "@/services/types";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { TabScreenNavProp } from "@/navigation/types";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -52,6 +54,7 @@ export default function SearchScreen() {
   const { isOffline } = useNetwork();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
+  const navigation = useNavigation<TabScreenNavProp>();
   const s = useMemo(() => makeStyles(colors), [colors]);
 
   const handleSearch = useCallback(async (text: string) => {
@@ -74,7 +77,12 @@ export default function SearchScreen() {
 
   return (
     <View style={[s.container, { paddingTop: insets.top + Spacing.sm }]}>
-      <Text style={s.title}>Search</Text>
+      <View style={s.titleContainer}>
+        <TouchableOpacity style={s.menuButton} onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={28} color={colors.onSurface} />
+        </TouchableOpacity>
+        <Text style={s.title}>Search</Text>
+      </View>
 
       <View style={s.searchBar}>
         <Ionicons name="search" size={20} color={colors.onSurfaceVariant} />
@@ -206,12 +214,25 @@ export default function SearchScreen() {
 const makeStyles = (c: ColorPalette) =>
   StyleSheet.create({
     container: { flex: 1, backgroundColor: c.background },
+    titleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: Spacing.xl,
+      marginBottom: Spacing.lg,
+      gap: Spacing.md,
+    },
+    menuButton: { 
+      width: 44, 
+      height: 44, 
+      borderRadius: Radii.full, 
+      backgroundColor: c.surfaceContainer, 
+      justifyContent: "center", 
+      alignItems: "center" 
+    },
     title: {
       fontSize: FontSizes.headlineLg,
       fontWeight: "700",
       color: c.onSurface,
-      paddingHorizontal: Spacing.xl,
-      marginBottom: Spacing.lg,
     },
     searchBar: {
       flexDirection: "row",

@@ -56,6 +56,11 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView style={s.container} contentContainerStyle={[s.contentContainer, { paddingTop: insets.top + Spacing.sm }]}>
+      <View style={s.profileHeader}>
+        <TouchableOpacity style={s.menuButton} onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={28} color={colors.onSurface} />
+        </TouchableOpacity>
+      </View>
       <View style={s.avatarSection}>
         <LinearGradient colors={[colors.primary, colors.secondary]} style={s.avatarRing}>
           <View style={s.avatarInner}><Ionicons name="person" size={40} color={colors.onSurfaceVariant} /></View>
@@ -238,6 +243,8 @@ function InfoSection({ title, colors, children }: { title: string; colors: Color
 const makeStyles = (c: ColorPalette) => StyleSheet.create({
   container: { flex: 1, backgroundColor: c.background },
   contentContainer: { paddingBottom: 140 },
+  profileHeader: { flexDirection: 'row', paddingHorizontal: Spacing.xl, marginBottom: Spacing.md },
+  menuButton: { width: 44, height: 44, borderRadius: Radii.full, backgroundColor: c.surfaceContainer, justifyContent: 'center', alignItems: 'center' },
   avatarSection: { alignItems: 'center', marginBottom: Spacing['3xl'] },
   avatarRing: { width: 100, height: 100, borderRadius: 50, padding: 3 },
   avatarInner: { flex: 1, borderRadius: 50, backgroundColor: c.surfaceContainer, justifyContent: 'center', alignItems: 'center' },

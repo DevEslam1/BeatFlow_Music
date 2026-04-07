@@ -1,6 +1,14 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { CompositeNavigationProp, RouteProp } from '@react-navigation/native';
+
+// ─── Drawer Stack ───
+export type DrawerParamList = {
+  MainTabs: undefined;
+  LocalTracks: undefined;
+  Settings: undefined;
+};
 
 // ─── Auth Stack ───
 export type AuthStackParamList = {
@@ -10,7 +18,7 @@ export type AuthStackParamList = {
 
 // ─── Main Stack (root after login) ───
 export type MainStackParamList = {
-  HomeTabs: undefined;
+  HomeDrawer: undefined;
   Player: undefined;
   Favorites: undefined;
   Recent: undefined;
@@ -29,7 +37,10 @@ export type TabParamList = {
 // ─── Composite nav types for tabs (tab + parent stack) ───
 export type TabScreenNavProp = CompositeNavigationProp<
   BottomTabNavigationProp<TabParamList>,
-  NativeStackNavigationProp<MainStackParamList>
+  CompositeNavigationProp<
+    DrawerNavigationProp<DrawerParamList>,
+    NativeStackNavigationProp<MainStackParamList>
+  >
 >;
 
 // ─── Convenience types ───

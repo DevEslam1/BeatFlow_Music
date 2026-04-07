@@ -58,7 +58,12 @@ export default function LibraryScreen() {
 
   return (
     <View style={[s.container, { paddingTop: insets.top + Spacing.sm }]}>
-      <Text style={s.title}>My Library</Text>
+      <View style={s.titleContainer}>
+        <TouchableOpacity style={s.menuButton} onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={28} color={colors.onSurface} />
+        </TouchableOpacity>
+        <Text style={s.title}>My Library</Text>
+      </View>
 
       <View style={s.searchBar}>
         <Ionicons name="search" size={18} color={colors.onSurfaceVariant} />
@@ -178,7 +183,9 @@ export default function LibraryScreen() {
 
 const makeStyles = (c: ColorPalette) => StyleSheet.create({
   container: { flex: 1, backgroundColor: c.background },
-  title: { fontSize: FontSizes.headlineLg, fontWeight: '700', color: c.onSurface, paddingHorizontal: Spacing.xl, marginBottom: Spacing.md },
+  titleContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing.xl, marginBottom: Spacing.md, gap: Spacing.md },
+  menuButton: { width: 44, height: 44, borderRadius: Radii.full, backgroundColor: c.surfaceContainer, justifyContent: 'center', alignItems: 'center' },
+  title: { fontSize: FontSizes.headlineLg, fontWeight: '700', color: c.onSurface },
   searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: c.surfaceContainer, marginHorizontal: Spacing.xl, borderRadius: Radii.md, paddingHorizontal: Spacing.lg, height: 44, gap: Spacing.sm, marginBottom: Spacing.md },
   searchInput: { flex: 1, color: c.onSurface, fontSize: FontSizes.bodyMd },
   tabRow: { flexDirection: 'row', paddingHorizontal: Spacing.xl, gap: Spacing.xs, marginBottom: Spacing.md },
