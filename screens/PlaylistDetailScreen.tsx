@@ -15,7 +15,7 @@ export default function PlaylistDetailScreen() {
   const route = useRoute<PlaylistDetailRouteProp>();
   const { id } = route.params;
   const { playlists, deletePlaylist, renamePlaylist } = usePlaylist();
-  const { playSong } = usePlayer();
+  const { playSong, isSongActive } = usePlayer();
   const { colors } = useTheme();
   const navigation = useNavigation();
   const s = useMemo(() => makeStyles(colors), [colors]);
@@ -85,7 +85,14 @@ export default function PlaylistDetailScreen() {
       </View>
 
       <FlatList data={playlist.songs} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 100 }}
-        renderItem={({ item, index }) => (<SongItem song={item} index={index} onPress={() => playSong(item, playlist.songs)} />)}
+        renderItem={({ item, index }) => (
+          <SongItem 
+            song={item} 
+            index={index} 
+            isActive={isSongActive(item.id)}
+            onPress={() => playSong(item, playlist.songs)} 
+          />
+        )}
         ListEmptyComponent={
           <View style={s.emptyState}>
             <Text style={s.emptyStateText}>No songs yet</Text>

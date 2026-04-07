@@ -37,7 +37,7 @@ export default function SearchScreen() {
   const [loading, setLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
   const [hasSearched, setHasSearched] = useState(false);
-  const { playSong } = usePlayer();
+  const { playSong, isSongActive } = usePlayer();
   const { isOffline } = useNetwork();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
@@ -108,7 +108,13 @@ export default function SearchScreen() {
       ) : (
         <FlatList data={results} keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingBottom: 160 }}
-          renderItem={({ item }) => (<SongItem song={item} onPress={() => playSong(item, results)} />)}
+          renderItem={({ item }) => (
+            <SongItem 
+              song={item} 
+              isActive={isSongActive(item.id)}
+              onPress={() => playSong(item, results)} 
+            />
+          )}
           ListEmptyComponent={<Text style={s.emptyText}>No results found for "{query}"</Text>}
         />
       )}

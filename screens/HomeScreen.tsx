@@ -37,7 +37,7 @@ const SUGGESTED_PLAYLISTS: SuggestedPlaylist[] = [
 
 export default function HomeScreen() {
   const { user } = useAuth();
-  const { recentlyPlayed, playSong } = usePlayer();
+  const { recentlyPlayed, playSong, isSongActive } = usePlayer();
   const { favorites } = usePlaylist();
   const { isOffline } = useNetwork();
   const insets = useSafeAreaInsets();
@@ -159,7 +159,13 @@ export default function HomeScreen() {
         <View style={s.sectionHeader}><Text style={s.sectionTitle}>Trending Now</Text></View>
         {loading ? <ActivityIndicator color={colors.primary} style={{ marginTop: Spacing.xl }} /> :
           trending.slice(0, 15).map((song, index) => (
-            <SongItem key={song.id} song={song} index={index} onPress={() => playSong(song, trending)} />
+            <SongItem 
+              key={song.id} 
+              song={song} 
+              index={index} 
+              isActive={isSongActive(song.id)}
+              onPress={() => playSong(song, trending)} 
+            />
           ))}
       </View>
       )}

@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Radii, Spacing, FontSizes, ColorPalette } from '@/constants/theme';
 import { Song } from '@/services/types';
 import { formatDuration } from '@/services/api';
+import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlaylist } from '@/contexts/PlaylistContext';
 import { useTheme } from '@/contexts/ThemeContext';
 
@@ -24,9 +25,11 @@ export default function SongItem({
   showDuration = true,
   isActive = false,
 }: SongItemProps) {
+  const { isPlaying: playerIsPlaying } = usePlayer();
   const { isFavorite, toggleFavorite } = usePlaylist();
   const { colors } = useTheme();
   const liked = isFavorite(song.id);
+  const isPlaying = isActive && playerIsPlaying;
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   return (
@@ -42,7 +45,18 @@ export default function SongItem({
           <Text style={styles.index}>{index + 1}</Text>
         )}
 
-        <Image source={{ uri: song.image }} style={styles.albumArt} />
+        <View style={styles.albumArtContainer}>
+          <Image source={{ uri: song.image }} style={styles.albumArt} />
+          {isActive && (
+            <View style={styles.activeOverlay}>
+              <Ionicons 
+                name={isPlaying ? 'pause' : 'play'} 
+                size={20} 
+                color="#fff" 
+              />
+            </View>
+          )}
+        </View>
 
         <View style={styles.info}>
           <Text
@@ -95,11 +109,25 @@ const makeStyles = (c: ColorPalette) =>
       textAlign: 'center',
       opacity: 0.5,
     },
+    albumArtContainer: {
+      position: 'relative',
+      marginLeft: Spacing.sm,
+    },
     albumArt: {
       width: 48,
       height: 48,
       borderRadius: Radii.md,
-      marginLeft: Spacing.sm,
+    },
+    activeOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.4)',
+      borderRadius: Radii.md,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     info: {
       flex: 1,

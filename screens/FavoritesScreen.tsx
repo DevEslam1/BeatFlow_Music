@@ -10,7 +10,7 @@ import SongItem from '@/components/SongItem';
 
 export default function FavoritesScreen() {
   const { favorites } = usePlaylist();
-  const { playSong } = usePlayer();
+  const { playSong, isSongActive } = usePlayer();
   const { colors } = useTheme();
   const navigation = useNavigation();
   const s = useMemo(() => makeStyles(colors), [colors]);
@@ -46,7 +46,14 @@ export default function FavoritesScreen() {
       </View>
 
       <FlatList data={favorites} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 100 }}
-        renderItem={({ item, index }) => (<SongItem song={item} index={index} onPress={() => playSong(item, favorites)} />)}
+        renderItem={({ item, index }) => (
+          <SongItem 
+            song={item} 
+            index={index} 
+            isActive={isSongActive(item.id)}
+            onPress={() => playSong(item, favorites)} 
+          />
+        )}
         ListEmptyComponent={
           <View style={s.emptyState}>
             <Ionicons name="heart-outline" size={48} color={colors.onSurfaceVariant} />

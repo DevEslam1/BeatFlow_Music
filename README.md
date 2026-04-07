@@ -18,6 +18,8 @@ A sleek, modern music streaming app built with **React Native** and **Expo**. GI
 - **Queue management** — songs are automatically queued from any list you play
 - **Background audio** support (stays active in background & silent mode on iOS via `UIBackgroundModes`)
 - **Mini Player** — persistent, floating mini player across all tabs
+- **Smart Play/Pause** — Selecting a song that is already "Now Playing" will toggle playback (Play ⇋ Pause) instead of reloading it from the beginning
+- **Active Song Indicators** — Visual "playing" animation overlay and Title color change for the active song across all lists (Trending, Search, Favorites, etc.)
 - **Share** your favorite tracks directly using the native share sheet
 - **Downloads & Offline Support** — save songs to local storage and enjoy seamless offline playback when you lose internet connection
 - **Safe Area Support** — Adaptive UI that perfectly fits all device notches and home indicators

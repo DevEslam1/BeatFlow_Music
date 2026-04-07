@@ -8,7 +8,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import SongItem from '@/components/SongItem';
 
 export default function RecentScreen() {
-  const { recentlyPlayed, playSong } = usePlayer();
+  const { recentlyPlayed, playSong, isSongActive } = usePlayer();
   const { colors } = useTheme();
   const navigation = useNavigation();
   const s = useMemo(() => makeStyles(colors), [colors]);
@@ -25,7 +25,14 @@ export default function RecentScreen() {
 
       <FlatList data={recentlyPlayed} keyExtractor={(item, index) => `${item.id}-${index}`}
         contentContainerStyle={{ paddingBottom: 100 }}
-        renderItem={({ item, index }) => (<SongItem song={item} index={index} onPress={() => playSong(item, recentlyPlayed)} />)}
+        renderItem={({ item, index }) => (
+          <SongItem 
+            song={item} 
+            index={index} 
+            isActive={isSongActive(item.id)}
+            onPress={() => playSong(item, recentlyPlayed)} 
+          />
+        )}
         ListEmptyComponent={
           <View style={s.emptyState}>
             <Ionicons name="time-outline" size={48} color={colors.onSurfaceVariant} />

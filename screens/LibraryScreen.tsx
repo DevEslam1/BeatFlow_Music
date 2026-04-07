@@ -24,7 +24,7 @@ export default function LibraryScreen() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'artist'>('name');
-  const { playSong } = usePlayer();
+  const { playSong, isSongActive } = usePlayer();
   const { playlists, favorites, downloads } = usePlaylist();
   const { isOffline } = useNetwork();
   const insets = useSafeAreaInsets();
@@ -88,7 +88,14 @@ export default function LibraryScreen() {
           </View>
           {loading ? <ActivityIndicator color={colors.primary} style={s.loader} /> : (
             <FlatList data={filteredSongs} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 180 }}
-              renderItem={({ item, index }) => (<SongItem song={item} index={index} onPress={() => playSong(item, filteredSongs)} />)} />
+              renderItem={({ item, index }) => (
+                <SongItem 
+                  song={item} 
+                  index={index} 
+                  isActive={isSongActive(item.id)}
+                  onPress={() => playSong(item, filteredSongs)} 
+                />
+              )} />
           )}
         </>
       )}
@@ -129,7 +136,14 @@ export default function LibraryScreen() {
               </TouchableOpacity>
             </View>
           ) : null}
-          renderItem={({ item, index }) => (<SongItem song={item} index={index} onPress={() => playSong(item, favorites)} />)}
+          renderItem={({ item, index }) => (
+            <SongItem 
+              song={item} 
+              index={index} 
+              isActive={isSongActive(item.id)}
+              onPress={() => playSong(item, favorites)} 
+            />
+          )}
           ListEmptyComponent={<Text style={s.emptyText}>No favorites yet. Like some songs!</Text>}
         />
       )}
@@ -147,7 +161,14 @@ export default function LibraryScreen() {
               </TouchableOpacity>
             </View>
           ) : null}
-          renderItem={({ item, index }) => (<SongItem song={item} index={index} onPress={() => playSong(item, downloads)} />)}
+          renderItem={({ item, index }) => (
+            <SongItem 
+              song={item} 
+              index={index} 
+              isActive={isSongActive(item.id)}
+              onPress={() => playSong(item, downloads)} 
+            />
+          )}
           ListEmptyComponent={<Text style={s.emptyText}>No downloads yet. Save some songs for offline listening!</Text>}
         />
       )}

@@ -23,6 +23,8 @@ interface PlayerContextType {
   toggleRepeat: () => void;
   seekTo: (position: number) => Promise<void>;
   addToQueue: (song: Song) => void;
+  isSongActive: (songId: string) => boolean;
+  isSongPlaying: (songId: string) => boolean;
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
@@ -135,21 +137,30 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   };
 
   const playSong = async (song: Song, songList?: Song[]) => {
+    // If selecting the current song, toggle playback instead of reloading
+    if (currentSong?.id === song.id) {
+      await togglePlayPause();
+      return;
+    }
+
     if (songList && songList.length > 0) {
       setQueue(songList);
       const index = songList.findIndex((s) => s.id === song.id);
       await loadAndPlay(song, index >= 0 ? index : 0);
     } else {
-      if (!queue.find((s) => s.id === song.id)) {
+      const existingIndex = queue.findIndex((s) => s.id === song.id);
+      if (existingIndex === -1) {
         const newQueue = [...queue, song];
         setQueue(newQueue);
         await loadAndPlay(song, newQueue.length - 1);
       } else {
-        const index = queue.findIndex((s) => s.id === song.id);
-        await loadAndPlay(song, index);
+        await loadAndPlay(song, existingIndex);
       }
     }
   };
+
+  const isSongActive = (songId: string) => currentSong?.id === songId;
+  const isSongPlaying = (songId: string) => isSongActive(songId) && isPlaying;
 
   const togglePlayPause = async () => {
     if (!soundRef.current) return;
@@ -226,6 +237,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         toggleRepeat,
         seekTo,
         addToQueue,
+        isSongActive,
+        isSongPlaying,
       }}
     >
       {children}
