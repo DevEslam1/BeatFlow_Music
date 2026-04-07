@@ -40,6 +40,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [queueIndex, setQueueIndex] = useState(0);
   const [recentlyPlayed, setRecentlyPlayed] = useState<Song[]>([]);
   const soundRef = useRef<Audio.Sound | null>(null);
+  const loadSequenceRef = useRef(0);
   
   const { downloads } = usePlaylist();
   const { isOffline } = useNetwork();
@@ -93,9 +94,16 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   }, [repeat, queue, queueIndex, shuffle]);
 
   const loadAndPlay = async (song: Song, index: number) => {
+    const currentSequence = ++loadSequenceRef.current;
     try {
       if (soundRef.current) {
-        await soundRef.current.unloadAsync();
+        const soundToUnload = soundRef.current;
+        soundRef.current = null;
+        try {
+          await soundToUnload.unloadAsync();
+        } catch (e) {
+          console.log('Error unloading previous sound:', e);
+        }
       }
 
       let urlToPlay = song.previewUrl;
@@ -120,6 +128,12 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         { shouldPlay: true },
         onPlaybackStatusUpdate
       );
+
+      // If a new request was made while we were loading, unload this one immediately
+      if (currentSequence !== loadSequenceRef.current) {
+        await sound.unloadAsync();
+        return;
+      }
 
       soundRef.current = sound;
       setCurrentSong(song);
