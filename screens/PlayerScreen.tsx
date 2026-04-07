@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Share } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -19,7 +19,7 @@ export default function PlayerScreen() {
     shuffle, repeat, togglePlayPause, skipNext, skipPrevious,
     toggleShuffle, toggleRepeat, seekTo,
   } = usePlayer();
-  const { isFavorite, toggleFavorite } = usePlaylist();
+  const { isFavorite, toggleFavorite, isDownloaded, toggleDownload } = usePlaylist();
   const { colors } = useTheme();
   const navigation = useNavigation();
   const s = useMemo(() => makeStyles(colors), [colors]);
@@ -37,11 +37,26 @@ export default function PlayerScreen() {
   }
 
   const liked = isFavorite(currentSong.id);
+  const downloaded = isDownloaded(currentSong.id);
   const progress = duration > 0 ? position / duration : 0;
 
   const handleSeek = (locationX: number, layoutWidth: number) => {
     const newPosition = (locationX / layoutWidth) * duration;
     seekTo(Math.max(0, Math.min(newPosition, duration)));
+  };
+
+  const handleShare = async () => {
+    try {
+      if (!currentSong) return;
+      const url = currentSong.uri || currentSong.previewUrl;
+      const message = `Check out "${currentSong.name}" by ${currentSong.artist} on Melody! ${url}`;
+      await Share.share({
+        message,
+        title: `Share ${currentSong.name}`,
+      });
+    } catch (error) {
+      console.error('Error sharing song:', error);
+    }
   };
 
   return (
@@ -51,7 +66,9 @@ export default function PlayerScreen() {
           <Ionicons name="chevron-down" size={28} color={colors.onSurface} />
         </TouchableOpacity>
         <Text style={s.headerTitle}>Now Playing</Text>
-        <TouchableOpacity><Ionicons name="ellipsis-horizontal" size={24} color={colors.onSurface} /></TouchableOpacity>
+        <TouchableOpacity onPress={handleShare}>
+          <Ionicons name="share-outline" size={24} color={colors.onSurface} />
+        </TouchableOpacity>
       </View>
 
       <View style={s.artContainer}>
@@ -64,9 +81,14 @@ export default function PlayerScreen() {
             <Text style={s.songTitle} numberOfLines={1}>{currentSong.name}</Text>
             <Text style={s.songArtist} numberOfLines={1}>{currentSong.artist}</Text>
           </View>
-          <TouchableOpacity onPress={() => toggleFavorite(currentSong)}>
-            <Ionicons name={liked ? 'heart' : 'heart-outline'} size={28} color={liked ? colors.primary : colors.onSurfaceVariant} />
-          </TouchableOpacity>
+          <View style={{ flexDirection: 'row', gap: Spacing.md }}>
+            <TouchableOpacity onPress={() => toggleDownload(currentSong)}>
+              <Ionicons name={downloaded ? 'cloud-done' : 'cloud-download-outline'} size={28} color={downloaded ? colors.primary : colors.onSurfaceVariant} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => toggleFavorite(currentSong)}>
+              <Ionicons name={liked ? 'heart' : 'heart-outline'} size={28} color={liked ? colors.primary : colors.onSurfaceVariant} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <TouchableOpacity style={s.progressContainer} activeOpacity={1}

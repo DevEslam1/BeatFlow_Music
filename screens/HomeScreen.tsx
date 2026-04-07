@@ -13,6 +13,7 @@ import { getChart, searchSongs } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlaylist } from '@/contexts/PlaylistContext';
+import { useNetwork } from '@/contexts/NetworkContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { TabScreenNavProp } from '@/navigation/types';
 import SongItem from '@/components/SongItem';
@@ -37,6 +38,7 @@ export default function HomeScreen() {
   const { user } = useAuth();
   const { recentlyPlayed, playSong } = usePlayer();
   const { favorites } = usePlaylist();
+  const { isOffline } = useNetwork();
   const { colors } = useTheme();
   const navigation = useNavigation<TabScreenNavProp>();
   const [trending, setTrending] = useState<Song[]>([]);
@@ -73,7 +75,16 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
+      {isOffline && (
+        <View style={s.offlineBanner}>
+          <Ionicons name="cloud-offline" size={48} color={colors.onSurfaceVariant} />
+          <Text style={s.offlineTitle}>You're Offline</Text>
+          <Text style={s.offlineDesc}>Go to Library → Downloads to play saved music.</Text>
+        </View>
+      )}
+
       {/* Suggested Playlists */}
+      {!isOffline && (
       <View style={s.section}>
         <View style={s.sectionHeader}><Text style={s.sectionTitle}>Made For You</Text></View>
         <FlatList horizontal data={SUGGESTED_PLAYLISTS} keyExtractor={(i) => i.id} showsHorizontalScrollIndicator={false}
@@ -95,6 +106,7 @@ export default function HomeScreen() {
           )}
         />
       </View>
+      )}
 
       {/* Recently Played */}
       {recentlyPlayed.length > 0 && (
@@ -140,6 +152,7 @@ export default function HomeScreen() {
       )}
 
       {/* Trending */}
+      {!isOffline && (
       <View style={s.section}>
         <View style={s.sectionHeader}><Text style={s.sectionTitle}>Trending Now</Text></View>
         {loading ? <ActivityIndicator color={colors.primary} style={{ marginTop: Spacing.xl }} /> :
@@ -147,6 +160,7 @@ export default function HomeScreen() {
             <SongItem key={song.id} song={song} index={index} onPress={() => playSong(song, trending)} />
           ))}
       </View>
+      )}
       <View style={{ height: 140 }} />
     </ScrollView>
   );
@@ -160,6 +174,9 @@ const makeStyles = (c: ColorPalette) => StyleSheet.create({
   greeting: { color: c.onSurfaceVariant, fontSize: FontSizes.bodyMd },
   userName: { color: c.onSurface, fontSize: FontSizes.headlineMd, fontWeight: '700' },
   notifButton: { width: 44, height: 44, borderRadius: Radii.full, backgroundColor: c.surfaceContainer, justifyContent: 'center', alignItems: 'center' },
+  offlineBanner: { alignItems: 'center', marginHorizontal: Spacing.xl, marginVertical: Spacing.xl, padding: Spacing.xl, backgroundColor: c.surfaceContainer, borderRadius: Radii.xl },
+  offlineTitle: { color: c.onSurface, fontSize: FontSizes.titleLg, fontWeight: '700', marginTop: Spacing.md },
+  offlineDesc: { color: c.onSurfaceVariant, fontSize: FontSizes.bodyMd, textAlign: 'center', marginTop: Spacing.sm },
   section: { marginBottom: Spacing['2xl'] },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: Spacing.xl, marginBottom: Spacing.md },
   sectionTitle: { color: c.onSurface, fontSize: FontSizes.titleLg, fontWeight: '700' },

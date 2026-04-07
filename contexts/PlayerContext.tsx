@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { Audio, AVPlaybackStatus } from 'expo-av';
+import { Alert } from 'react-native';
 import { Song } from '@/services/types';
+import { usePlaylist } from './PlaylistContext';
+import { useNetwork } from './NetworkContext';
 
 interface PlayerContextType {
   currentSong: Song | null;
@@ -35,6 +38,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [queueIndex, setQueueIndex] = useState(0);
   const [recentlyPlayed, setRecentlyPlayed] = useState<Song[]>([]);
   const soundRef = useRef<Audio.Sound | null>(null);
+  
+  const { downloads } = usePlaylist();
+  const { isOffline } = useNetwork();
 
   useEffect(() => {
     Audio.setAudioModeAsync({
@@ -90,8 +96,25 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         await soundRef.current.unloadAsync();
       }
 
+      let urlToPlay = song.previewUrl;
+      
+      // Substitute with local file if downloaded
+      const downloadedSong = downloads.find(s => s.id === song.id);
+      if (downloadedSong) {
+        urlToPlay = downloadedSong.previewUrl;
+      }
+
+      if (isOffline && !urlToPlay.startsWith('file://')) {
+        Alert.alert(
+          'Offline Mode',
+          'This song is not downloaded. Please connect to the internet or play downloaded songs from your library.'
+        );
+        setIsPlaying(false);
+        return;
+      }
+
       const { sound } = await Audio.Sound.createAsync(
-        { uri: song.previewUrl },
+        { uri: urlToPlay },
         { shouldPlay: true },
         onPlaybackStatusUpdate
       );

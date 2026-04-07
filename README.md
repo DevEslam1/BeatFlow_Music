@@ -18,6 +18,9 @@ A sleek, modern music streaming app built with **React Native** and **Expo**. GI
 - **Queue management** — songs are automatically queued from any list you play
 - **Background audio** support (stays active in background & silent mode on iOS)
 - **Mini Player** — persistent, floating mini player across all tabs
+- **Share** your favorite tracks directly using the native share sheet
+- **Downloads & Offline Support** — save songs to local storage and enjoy seamless offline playback when you lose internet connection
+
 
 ### 🔍 Search & Discovery
 
@@ -31,11 +34,13 @@ A sleek, modern music streaming app built with **React Native** and **Expo**. GI
 - **Songs tab** — browse all available tracks with sort by name or artist
 - **Playlists tab** — create, rename, and delete custom playlists
 - **Favorites tab** — one-tap heart to save/unsave any song
+- **Downloads tab** — acts as your local hub for all saved offline music
 - **Search within library** — filter your personal collection
 
 ### 👤 User Profile & Settings
 
 - **Authentication** — sign up & login with local persistence via `AsyncStorage`
+- **Network Awareness** — real-time detection of connectivity to block online streams when offline
 - **User stats** — favorites count, playlist count, songs played
 - **Dynamic Theme Engine** — instantly toggle between Dark, Light, and System modes
 - **Information Modals** — accessible panels for Privacy Policy, Help & Support, and About info
@@ -56,8 +61,10 @@ A sleek, modern music streaming app built with **React Native** and **Expo**. GI
 | **Navigation**   | React Navigation 7 (Native Stack & Bottom Tabs)             |
 | **Audio**        | expo-av                                                     |
 | **API**          | Deezer Public API                                           |
-| **State**        | React Context (Auth, Player, Playlist, Theme)               |
+| **State**        | React Context (Auth, Player, Playlist, Theme, Network)      |
 | **Persistence**  | @react-native-async-storage/async-storage                   |
+| **File System**  | expo-file-system                                            |
+| **Network**      | @react-native-community/netinfo                             |
 | **Images**       | expo-image                                                  |
 | **UI Effects**   | expo-linear-gradient, expo-blur, expo-haptics               |
 | **Language**     | TypeScript 5.9                                              |
@@ -89,8 +96,9 @@ GIG_Music_Player/
 │   └── SongItem.tsx         # Reusable song row component
 ├── contexts/
 │   ├── AuthContext.tsx       # Authentication state & persistence
+│   ├── NetworkContext.tsx    # Connection state & offline checks
 │   ├── PlayerContext.tsx     # Audio playback engine & queue state
-│   ├── PlaylistContext.tsx   # Playlists, favorites & persistence
+│   ├── PlaylistContext.tsx   # Playlists, favorites, downloads & persistence
 │   └── ThemeContext.tsx      # Dual-mode theme state (Light/Dark/System)
 ├── services/
 │   ├── api.ts               # Deezer API client (search, charts, tracks, artists)

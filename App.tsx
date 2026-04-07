@@ -8,6 +8,7 @@ import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { PlayerProvider } from '@/contexts/PlayerContext';
 import { PlaylistProvider } from '@/contexts/PlaylistContext';
+import { NetworkProvider } from '@/contexts/NetworkContext';
 import { AuthStackParamList, MainStackParamList } from '@/navigation/types';
 import TabNavigator from '@/navigation/TabNavigator';
 import LoginScreen from '@/screens/LoginScreen';
@@ -113,13 +114,15 @@ function AppNavigator() {
 export default function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <PlayerProvider>
+      <NetworkProvider>
+        <AuthProvider>
           <PlaylistProvider>
-            <AppNavigator />
+            <PlayerProvider>
+              <AppNavigator />
+            </PlayerProvider>
           </PlaylistProvider>
-        </PlayerProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </NetworkProvider>
     </ThemeProvider>
   );
 }

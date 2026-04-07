@@ -8,6 +8,7 @@ import { Spacing, Radii, FontSizes, ColorPalette } from '@/constants/theme';
 import { Song } from '@/services/types';
 import { searchSongs } from '@/services/api';
 import { usePlayer } from '@/contexts/PlayerContext';
+import { useNetwork } from '@/contexts/NetworkContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import SongItem from '@/components/SongItem';
 
@@ -36,6 +37,7 @@ export default function SearchScreen() {
   const [activeFilter, setActiveFilter] = useState('All');
   const [hasSearched, setHasSearched] = useState(false);
   const { playSong } = usePlayer();
+  const { isOffline } = useNetwork();
   const { colors } = useTheme();
   const s = useMemo(() => makeStyles(colors), [colors]);
 
@@ -63,6 +65,16 @@ export default function SearchScreen() {
         )}
       </View>
 
+      {isOffline && (
+        <View style={s.offlineBanner}>
+          <Ionicons name="cloud-offline" size={48} color={colors.onSurfaceVariant} />
+          <Text style={s.offlineTitle}>Search Unavailable</Text>
+          <Text style={s.offlineDesc}>You are currently offline. Please check your connection to search for new music.</Text>
+        </View>
+      )}
+
+      {!isOffline && (
+        <>
       <View style={s.filterContainer}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.filterRow}>
           {FILTERS.map((filter) => (
@@ -98,6 +110,8 @@ export default function SearchScreen() {
           ListEmptyComponent={<Text style={s.emptyText}>No results found for "{query}"</Text>}
         />
       )}
+        </>
+      )}
     </View>
   );
 }
@@ -107,6 +121,9 @@ const makeStyles = (c: ColorPalette) => StyleSheet.create({
   title: { fontSize: FontSizes.headlineLg, fontWeight: '700', color: c.onSurface, paddingHorizontal: Spacing.xl, marginBottom: Spacing.lg },
   searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: c.surfaceContainer, marginHorizontal: Spacing.xl, borderRadius: Radii.md, paddingHorizontal: Spacing.lg, height: 48, gap: Spacing.sm },
   searchInput: { flex: 1, color: c.onSurface, fontSize: FontSizes.bodyMd },
+  offlineBanner: { alignItems: 'center', marginHorizontal: Spacing.xl, marginVertical: Spacing.xl, padding: Spacing.xl, backgroundColor: c.surfaceContainer, borderRadius: Radii.xl },
+  offlineTitle: { color: c.onSurface, fontSize: FontSizes.titleLg, fontWeight: '700', marginTop: Spacing.md },
+  offlineDesc: { color: c.onSurfaceVariant, fontSize: FontSizes.bodyMd, textAlign: 'center', marginTop: Spacing.sm },
   filterContainer: { height: 52, marginTop: Spacing.sm, marginBottom: Spacing.xs },
   filterRow: { paddingHorizontal: Spacing.xl, flexDirection: 'row', alignItems: 'center', height: 52 },
   filterChip: { paddingHorizontal: 18, paddingVertical: 10, borderRadius: Radii.full, backgroundColor: c.surfaceContainerHigh, marginRight: Spacing.sm },

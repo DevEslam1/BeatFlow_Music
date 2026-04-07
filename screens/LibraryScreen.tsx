@@ -10,11 +10,12 @@ import { Song } from '@/services/types';
 import { getChart } from '@/services/api';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlaylist } from '@/contexts/PlaylistContext';
+import { useNetwork } from '@/contexts/NetworkContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { TabScreenNavProp } from '@/navigation/types';
 import SongItem from '@/components/SongItem';
 
-const TABS = ['Songs', 'Playlists', 'Favorites'];
+const TABS = ['Songs', 'Playlists', 'Favorites', 'Downloads'];
 
 export default function LibraryScreen() {
   const [activeTab, setActiveTab] = useState('Songs');
@@ -23,10 +24,17 @@ export default function LibraryScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'artist'>('name');
   const { playSong } = usePlayer();
-  const { playlists, favorites } = usePlaylist();
+  const { playlists, favorites, downloads } = usePlaylist();
+  const { isOffline } = useNetwork();
   const { colors } = useTheme();
   const navigation = useNavigation<TabScreenNavProp>();
   const s = useMemo(() => makeStyles(colors), [colors]);
+
+  useEffect(() => {
+    if (isOffline && activeTab === 'Songs') {
+      setActiveTab('Downloads');
+    }
+  }, [isOffline, activeTab]);
 
   useEffect(() => { loadSongs(); }, []);
 
@@ -57,7 +65,7 @@ export default function LibraryScreen() {
       </View>
 
       <View style={s.tabRow}>
-        {TABS.map((tab) => (
+        {TABS.filter(tab => !(isOffline && tab === 'Songs')).map((tab) => (
           <TouchableOpacity key={tab} style={[s.tab, activeTab === tab && s.activeTab]} onPress={() => setActiveTab(tab)}>
             <Text style={[s.tabText, activeTab === tab && s.activeTabText]}>{tab}</Text>
           </TouchableOpacity>
@@ -121,6 +129,24 @@ export default function LibraryScreen() {
           ) : null}
           renderItem={({ item, index }) => (<SongItem song={item} index={index} onPress={() => playSong(item, favorites)} />)}
           ListEmptyComponent={<Text style={s.emptyText}>No favorites yet. Like some songs!</Text>}
+        />
+      )}
+
+      {activeTab === 'Downloads' && (
+        <FlatList data={downloads} keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 180 }}
+          ListHeaderComponent={downloads.length > 0 ? (
+            <View style={s.favHeader}>
+              <TouchableOpacity style={s.shuffleButton} onPress={() => {
+                if (downloads.length > 0) { const i = Math.floor(Math.random() * downloads.length); playSong(downloads[i], downloads); }
+              }}>
+                <Ionicons name="shuffle" size={18} color={colors.onPrimaryFixed} />
+                <Text style={s.shuffleText}>Shuffle</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
+          renderItem={({ item, index }) => (<SongItem song={item} index={index} onPress={() => playSong(item, downloads)} />)}
+          ListEmptyComponent={<Text style={s.emptyText}>No downloads yet. Save some songs for offline listening!</Text>}
         />
       )}
     </View>
