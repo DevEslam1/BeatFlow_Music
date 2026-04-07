@@ -4,6 +4,7 @@ import {
   FlatList, ActivityIndicator, Dimensions,
 } from 'react-native';
 import { Image } from 'expo-image';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -39,6 +40,7 @@ export default function HomeScreen() {
   const { recentlyPlayed, playSong } = usePlayer();
   const { favorites } = usePlaylist();
   const { isOffline } = useNetwork();
+  const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const navigation = useNavigation<TabScreenNavProp>();
   const [trending, setTrending] = useState<Song[]>([]);
@@ -64,7 +66,7 @@ export default function HomeScreen() {
   const greeting = () => { const h = new Date().getHours(); if (h < 12) return 'Good Morning'; if (h < 18) return 'Good Afternoon'; return 'Good Evening'; };
 
   return (
-    <ScrollView style={s.container} contentContainerStyle={s.contentContainer}>
+    <ScrollView style={s.container} contentContainerStyle={[s.contentContainer, { paddingTop: insets.top + Spacing.sm }]}>
       <View style={s.header}>
         <View>
           <Text style={s.greeting}>{greeting()}</Text>
@@ -169,7 +171,7 @@ export default function HomeScreen() {
 const CARD_WIDTH = SCREEN_WIDTH * 0.42;
 const makeStyles = (c: ColorPalette) => StyleSheet.create({
   container: { flex: 1, backgroundColor: c.background },
-  contentContainer: { paddingTop: 60 },
+  contentContainer: { paddingBottom: 140 },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: Spacing.xl, marginBottom: Spacing['2xl'] },
   greeting: { color: c.onSurfaceVariant, fontSize: FontSizes.bodyMd },
   userName: { color: c.onSurface, fontSize: FontSizes.headlineMd, fontWeight: '700' },

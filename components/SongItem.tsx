@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Animated, { FadeInRight } from 'react-native-reanimated';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { Radii, Spacing, FontSizes, ColorPalette } from '@/constants/theme';
@@ -29,45 +30,49 @@ export default function SongItem({
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   return (
-    <TouchableOpacity
-      style={[styles.container, isActive && styles.activeContainer]}
-      onPress={onPress}
-      activeOpacity={0.7}
+    <Animated.View 
+      entering={FadeInRight.delay((index ?? 0) * 50).duration(400)}
     >
-      {index !== undefined && (
-        <Text style={styles.index}>{index + 1}</Text>
-      )}
-
-      <Image source={{ uri: song.image }} style={styles.albumArt} />
-
-      <View style={styles.info}>
-        <Text
-          style={[styles.title, isActive && styles.activeTitle]}
-          numberOfLines={1}
-        >
-          {song.name}
-        </Text>
-        <Text style={styles.artist} numberOfLines={1}>
-          {song.artist}
-        </Text>
-      </View>
-
-      {showDuration && (
-        <Text style={styles.duration}>{formatDuration(song.duration)}</Text>
-      )}
-
       <TouchableOpacity
-        style={styles.heartButton}
-        onPress={() => toggleFavorite(song)}
-        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        style={[styles.container, isActive && styles.activeContainer]}
+        onPress={onPress}
+        activeOpacity={0.7}
       >
-        <Ionicons
-          name={liked ? 'heart' : 'heart-outline'}
-          size={20}
-          color={liked ? colors.primary : colors.onSurfaceVariant}
-        />
+        {index !== undefined && (
+          <Text style={styles.index}>{index + 1}</Text>
+        )}
+
+        <Image source={{ uri: song.image }} style={styles.albumArt} />
+
+        <View style={styles.info}>
+          <Text
+            style={[styles.title, isActive && styles.activeTitle]}
+            numberOfLines={1}
+          >
+            {song.name}
+          </Text>
+          <Text style={styles.artist} numberOfLines={1}>
+            {song.artist}
+          </Text>
+        </View>
+
+        {showDuration && (
+          <Text style={styles.duration}>{formatDuration(song.duration)}</Text>
+        )}
+
+        <TouchableOpacity
+          style={styles.heartButton}
+          onPress={() => toggleFavorite(song)}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons
+            name={liked ? 'heart' : 'heart-outline'}
+            size={20}
+            color={liked ? colors.primary : colors.onSurfaceVariant}
+          />
+        </TouchableOpacity>
       </TouchableOpacity>
-    </TouchableOpacity>
+    </Animated.View>
   );
 }
 

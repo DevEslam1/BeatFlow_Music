@@ -1,8 +1,42 @@
-// Sonic Noir — Design System Tokens (Dark + Light)
+export type ColorPalette = {
+  background: string;
+  surface: string;
+  surfaceDim: string;
+  surfaceContainerLowest: string;
+  surfaceContainerLow: string;
+  surfaceContainer: string;
+  surfaceContainerHigh: string;
+  surfaceContainerHighest: string;
+  surfaceBright: string;
+  surfaceVariant: string;
+  primary: string;
+  primaryContainer: string;
+  primaryDim: string;
+  onPrimary: string;
+  onPrimaryFixed: string;
+  secondary: string;
+  secondaryContainer: string;
+  secondaryDim: string;
+  onSecondary: string;
+  tertiary: string;
+  tertiaryContainer: string;
+  onTertiary: string;
+  error: string;
+  errorContainer: string;
+  onError: string;
+  onBackground: string;
+  onSurface: string;
+  onSurfaceVariant: string;
+  outline: string;
+  outlineVariant: string;
+  inverseSurface: string;
+  inversePrimary: string;
+  tabBarBg: string;
+  miniPlayerBg: string;
+  statusBarStyle: 'light' | 'dark';
+};
 
-export type ColorPalette = typeof DarkColors;
-
-export const DarkColors = {
+export const DarkColors: ColorPalette = {
   background: '#0e0e0e',
   surface: '#0e0e0e',
   surfaceDim: '#0e0e0e',
@@ -42,10 +76,9 @@ export const DarkColors = {
   inverseSurface: '#fcf9f8',
   inversePrimary: '#9900d1',
 
-  // Mini player / tab bar
   tabBarBg: 'rgba(38, 38, 38, 0.85)',
   miniPlayerBg: 'rgba(26, 26, 26, 0.95)',
-  statusBarStyle: 'light' as const,
+  statusBarStyle: 'light',
 };
 
 export const LightColors: ColorPalette = {
@@ -90,10 +123,9 @@ export const LightColors: ColorPalette = {
 
   tabBarBg: 'rgba(239, 237, 243, 0.92)',
   miniPlayerBg: 'rgba(245, 242, 247, 0.97)',
-  statusBarStyle: 'dark' as const,
+  statusBarStyle: 'dark',
 };
 
-// Keep legacy export for files not yet migrated (fallback to dark)
 export const Colors = DarkColors;
 
 export const Fonts = {
@@ -139,5 +171,6 @@ export const Radii = {
   lg: 12,
   xl: 16,
   '2xl': 24,
+  '3xl': 32,
   full: 9999,
 };

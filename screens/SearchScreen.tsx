@@ -3,6 +3,7 @@ import {
   View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet,
   ActivityIndicator, ScrollView, Dimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Spacing, Radii, FontSizes, ColorPalette } from '@/constants/theme';
 import { Song } from '@/services/types';
@@ -38,6 +39,7 @@ export default function SearchScreen() {
   const [hasSearched, setHasSearched] = useState(false);
   const { playSong } = usePlayer();
   const { isOffline } = useNetwork();
+  const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const s = useMemo(() => makeStyles(colors), [colors]);
 
@@ -51,7 +53,7 @@ export default function SearchScreen() {
   }, []);
 
   return (
-    <View style={s.container}>
+    <View style={[s.container, { paddingTop: insets.top + Spacing.sm }]}>
       <Text style={s.title}>Search</Text>
 
       <View style={s.searchBar}>
@@ -117,7 +119,7 @@ export default function SearchScreen() {
 }
 
 const makeStyles = (c: ColorPalette) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: c.background, paddingTop: 60 },
+  container: { flex: 1, backgroundColor: c.background },
   title: { fontSize: FontSizes.headlineLg, fontWeight: '700', color: c.onSurface, paddingHorizontal: Spacing.xl, marginBottom: Spacing.lg },
   searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: c.surfaceContainer, marginHorizontal: Spacing.xl, borderRadius: Radii.md, paddingHorizontal: Spacing.lg, height: 48, gap: Spacing.sm },
   searchInput: { flex: 1, color: c.onSurface, fontSize: FontSizes.bodyMd },

@@ -3,6 +3,7 @@ import {
   View, Text, TouchableOpacity, StyleSheet, FlatList,
   ActivityIndicator, TextInput,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Spacing, Radii, FontSizes, ColorPalette } from '@/constants/theme';
@@ -26,6 +27,7 @@ export default function LibraryScreen() {
   const { playSong } = usePlayer();
   const { playlists, favorites, downloads } = usePlaylist();
   const { isOffline } = useNetwork();
+  const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const navigation = useNavigation<TabScreenNavProp>();
   const s = useMemo(() => makeStyles(colors), [colors]);
@@ -55,7 +57,7 @@ export default function LibraryScreen() {
   };
 
   return (
-    <View style={s.container}>
+    <View style={[s.container, { paddingTop: insets.top + Spacing.sm }]}>
       <Text style={s.title}>My Library</Text>
 
       <View style={s.searchBar}>
@@ -154,7 +156,7 @@ export default function LibraryScreen() {
 }
 
 const makeStyles = (c: ColorPalette) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: c.background, paddingTop: 60 },
+  container: { flex: 1, backgroundColor: c.background },
   title: { fontSize: FontSizes.headlineLg, fontWeight: '700', color: c.onSurface, paddingHorizontal: Spacing.xl, marginBottom: Spacing.md },
   searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: c.surfaceContainer, marginHorizontal: Spacing.xl, borderRadius: Radii.md, paddingHorizontal: Spacing.lg, height: 44, gap: Spacing.sm, marginBottom: Spacing.md },
   searchInput: { flex: 1, color: c.onSurface, fontSize: FontSizes.bodyMd },

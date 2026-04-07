@@ -1,7 +1,10 @@
 import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
+
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 import { useNavigation } from '@react-navigation/native';
 import { Radii, Spacing, FontSizes, ColorPalette } from '@/constants/theme';
 import { usePlayer } from '@/contexts/PlayerContext';
@@ -30,7 +33,12 @@ export default function MiniPlayer() {
       </View>
 
       <View style={styles.content}>
-        <Image source={{ uri: currentSong.image }} style={styles.albumArt} />
+        <AnimatedImage 
+          source={{ uri: currentSong.image }} 
+          style={styles.albumArt} 
+          // @ts-ignore - sharedTransitionTag is handled at runtime by Reanimated
+          sharedTransitionTag={`albumArt-${currentSong.id}`}
+        />
 
         <View style={styles.info}>
           <Text style={styles.title} numberOfLines={1}>

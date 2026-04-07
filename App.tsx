@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -47,7 +48,8 @@ function MainNavigator() {
       screenOptions={{
         headerShown: false,
         contentStyle: { backgroundColor: colors.background },
-        animation: 'slide_from_right',
+        animation: 'ios_from_right',
+        gestureEnabled: true,
       }}
     >
       <MainStack.Screen name="HomeTabs" component={TabNavigator} />
@@ -55,8 +57,9 @@ function MainNavigator() {
         name="Player"
         component={PlayerScreen}
         options={{
-          animation: 'slide_from_bottom',
+          animation: 'fade_from_bottom',
           gestureDirection: 'vertical',
+          fullScreenGestureEnabled: true,
         }}
       />
       <MainStack.Screen name="Favorites" component={FavoritesScreen} />
@@ -110,11 +113,11 @@ function AppNavigator() {
     </>
   );
 }
-
 export default function App() {
   return (
-    <ThemeProvider>
-      <NetworkProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <NetworkProvider>
         <AuthProvider>
           <PlaylistProvider>
             <PlayerProvider>
@@ -124,5 +127,6 @@ export default function App() {
         </AuthProvider>
       </NetworkProvider>
     </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

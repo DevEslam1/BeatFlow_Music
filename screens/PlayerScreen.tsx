@@ -1,7 +1,11 @@
 import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Dimensions, Share } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
+
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Spacing, Radii, FontSizes, ColorPalette } from '@/constants/theme';
@@ -21,6 +25,7 @@ export default function PlayerScreen() {
   } = usePlayer();
   const { isFavorite, toggleFavorite, isDownloaded, toggleDownload } = usePlaylist();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const s = useMemo(() => makeStyles(colors), [colors]);
 
@@ -60,7 +65,7 @@ export default function PlayerScreen() {
   };
 
   return (
-    <View style={s.container}>
+    <View style={[s.container, { paddingTop: insets.top + Spacing.sm, paddingBottom: insets.bottom + Spacing.xl }]}>
       <View style={s.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-down" size={28} color={colors.onSurface} />
@@ -72,7 +77,12 @@ export default function PlayerScreen() {
       </View>
 
       <View style={s.artContainer}>
-        <Image source={{ uri: currentSong.image }} style={s.albumArt} />
+        <AnimatedImage 
+          source={{ uri: currentSong.image }} 
+          style={s.albumArt} 
+          // @ts-ignore - sharedTransitionTag is handled at runtime by Reanimated
+          sharedTransitionTag={`albumArt-${currentSong.id}`}
+        />
       </View>
 
       <View style={s.infoSection}>
@@ -130,7 +140,7 @@ export default function PlayerScreen() {
 }
 
 const makeStyles = (c: ColorPalette) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: c.background, paddingTop: 60 },
+  container: { flex: 1, backgroundColor: c.background },
   emptyContainer: { flex: 1, backgroundColor: c.background, justifyContent: 'center', alignItems: 'center', gap: Spacing.lg },
   emptyText: { color: c.onSurfaceVariant, fontSize: FontSizes.bodyLg },
   goBack: { color: c.primary, fontSize: FontSizes.bodyMd },

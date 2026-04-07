@@ -1,5 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -14,6 +15,9 @@ const Tab = createBottomTabNavigator<TabParamList>();
 
 export default function TabNavigator() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+
+  const TAB_BAR_HEIGHT = 60 + insets.bottom;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -25,8 +29,8 @@ export default function TabNavigator() {
           tabBarStyle: {
             backgroundColor: colors.tabBarBg,
             borderTopWidth: 0,
-            height: 70,
-            paddingBottom: 10,
+            height: TAB_BAR_HEIGHT,
+            paddingBottom: insets.bottom > 0 ? insets.bottom : 10,
             paddingTop: 8,
           },
           tabBarLabelStyle: {
@@ -72,7 +76,7 @@ export default function TabNavigator() {
           }}
         />
       </Tab.Navigator>
-      <View style={{ position: 'absolute', bottom: 70, left: 0, right: 0 }}>
+      <View style={{ position: 'absolute', bottom: TAB_BAR_HEIGHT, left: 0, right: 0 }}>
         <MiniPlayer />
       </View>
     </View>

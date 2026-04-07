@@ -16,10 +16,17 @@ A sleek, modern music streaming app built with **React Native** and **Expo**. GI
 - **Full playback controls** — play, pause, skip, seek with a draggable progress bar
 - **Shuffle & Repeat** modes (off → all → one)
 - **Queue management** — songs are automatically queued from any list you play
-- **Background audio** support (stays active in background & silent mode on iOS)
+- **Background audio** support (stays active in background & silent mode on iOS via `UIBackgroundModes`)
 - **Mini Player** — persistent, floating mini player across all tabs
 - **Share** your favorite tracks directly using the native share sheet
 - **Downloads & Offline Support** — save songs to local storage and enjoy seamless offline playback when you lose internet connection
+- **Safe Area Support** — Adaptive UI that perfectly fits all device notches and home indicators
+- **Smooth Transitions** — `ios_from_right` global navigation and `fade_from_bottom` player entrance
+- **Shared Element Transitions** — Album art gracefully "morphs" between Mini Player and Full Player
+- **Staggered Animations** — Song list items slide in with a fluid, staggered entrance effect
+- **Full-Screen Gestures** — Swipe down from anywhere on the player to minimize it back to the bar
+
+
 
 
 ### 🔍 Search & Discovery
@@ -41,15 +48,28 @@ A sleek, modern music streaming app built with **React Native** and **Expo**. GI
 
 - **Authentication** — sign up & login with local persistence via `AsyncStorage`
 - **Network Awareness** — real-time detection of connectivity to block online streams when offline
+- **iOS Optimized** — pre-configured for background audio and silent mode playback
+- **Haptic Feedback** — Tactile confirmation for likes and downloads via `expo-haptics`
 - **User stats** — favorites count, playlist count, songs played
+
+
 - **Dynamic Theme Engine** — instantly toggle between Dark, Light, and System modes
 - **Information Modals** — accessible panels for Privacy Policy, Help & Support, and About info
+
+### 🛠️ Personalization & Support
+
+- **Developer Profile** — Dedicated "About the Developer" section featuring **Eslam Mahmoud**'s professional portfolio and technical expertise.
+- **Interactive Support** — Clickable contact links in the "Help & Support" section for instant Email, Phone, LinkedIn, and GitHub access.
+- **Brand Integration** — Official branding icons for Gmail, LinkedIn, and GitHub for a premium, production-ready feel.
+- **Smooth Modals** — High-end bottom sheet modals with `3xl` rounded corners and interactive backdrop-to-close gestures.
 
 ### 🎨 Design
 
 - **Sonic Noir** dynamic theme with vibrant purple/cyan (`#de8eff`/`#00f4fe`) accents
-- **Gradient accents** — linear gradients on play button, progress bar, and avatar ring
-- **Edge-to-edge** layout on Android with `edgeToEdgeEnabled`
+- **Premium Aesthetics** — modern `3xl` corner radii (32pt) for cards and modals, creating a soft, high-end look
+- **Glassmorphism Lite** — subtle blur effects on Mini Player and overlay components
+- **Gradient accents** — linear gradients on play button, progress bar, avatar ring, and brand accents
+- **Edge-to-edge** layout on Android with `edgeToEdgeEnabled` and full safe area support on iOS
 
 ---
 
@@ -59,16 +79,21 @@ A sleek, modern music streaming app built with **React Native** and **Expo**. GI
 | ---------------- | ----------------------------------------------------------- |
 | **Framework**    | React Native 0.81 + Expo SDK 54                             |
 | **Navigation**   | React Navigation 7 (Native Stack & Bottom Tabs)             |
+| **Animations**   | react-native-reanimated                                     |
 | **Audio**        | expo-av                                                     |
+
 | **API**          | Deezer Public API                                           |
 | **State**        | React Context (Auth, Player, Playlist, Theme, Network)      |
 | **Persistence**  | @react-native-async-storage/async-storage                   |
 | **File System**  | expo-file-system                                            |
 | **Network**      | @react-native-community/netinfo                             |
+| **Safe Area**    | react-native-safe-area-context                              |
 | **Images**       | expo-image                                                  |
-| **UI Effects**   | expo-linear-gradient, expo-blur, expo-haptics               |
+
+| **UI Effects**   | expo-linear-gradient, expo-blur, expo-haptics, expo-linking |
 | **Language**     | TypeScript 5.9                                              |
 | **Architecture** | React New Architecture enabled                              |
+| **Developer**    | **Eslam Mahmoud** — Mobile Applications Engineer            |
 
 ---
 

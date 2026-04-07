@@ -2,7 +2,9 @@ import React, { useState, useMemo } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Modal,
 } from 'react-native';
+import * as Linking from 'expo-linking';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { Spacing, Radii, FontSizes, ColorPalette } from '@/constants/theme';
@@ -16,8 +18,14 @@ export default function ProfileScreen() {
   const { favorites, playlists } = usePlaylist();
   const { recentlyPlayed } = usePlayer();
   const { colors, mode, setMode } = useTheme();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
   const s = useMemo(() => makeStyles(colors), [colors]);
+  const handleOpenLink = (url: string) => {
+    Linking.openURL(url).catch(() => {
+      Alert.alert('Error', 'Could not open the link.');
+    });
+  };
 
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -47,7 +55,7 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <ScrollView style={s.container} contentContainerStyle={s.contentContainer}>
+    <ScrollView style={s.container} contentContainerStyle={[s.contentContainer, { paddingTop: insets.top + Spacing.sm }]}>
       <View style={s.avatarSection}>
         <LinearGradient colors={[colors.primary, colors.secondary]} style={s.avatarRing}>
           <View style={s.avatarInner}><Ionicons name="person" size={40} color={colors.onSurfaceVariant} /></View>
@@ -95,34 +103,72 @@ export default function ProfileScreen() {
 
       <View style={{ height: 140 }} />
 
-      {/* Privacy Modal */}
       <InfoModal visible={showPrivacy} onClose={() => setShowPrivacy(false)} title="Privacy Policy" colors={colors}>
-        <InfoSection title="Data Collection" colors={colors}>GIG Music Player does not collect, store, or transmit any personal data to external servers. All your data is stored locally on your device using AsyncStorage.</InfoSection>
-        <InfoSection title="Third-Party Services" colors={colors}>We use the Deezer public API to fetch music metadata and 30-second previews. No personal information is shared with Deezer.</InfoSection>
-        <InfoSection title="Local Storage" colors={colors}>Your account credentials, playlists, and preferences are saved locally on your device. Uninstalling will delete all stored data.</InfoSection>
-        <InfoSection title="Your Rights" colors={colors}>Since all data is stored locally, you have full control. Delete at any time by clearing app data or uninstalling.</InfoSection>
+        <InfoSection title="Data Collection" colors={colors}>
+          <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd }}>GIG Music Player does not collect, store, or transmit any personal data to external servers. All your data is stored locally on your device using AsyncStorage.</Text>
+        </InfoSection>
+        <InfoSection title="Third-Party Services" colors={colors}>
+          <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd }}>We use the Deezer public API to fetch music metadata and 30-second previews. No personal information is shared with Deezer.</Text>
+        </InfoSection>
+        <InfoSection title="Local Storage" colors={colors}>
+          <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd }}>Your account credentials, playlists, and preferences are saved locally on your device. Uninstalling will delete all stored data.</Text>
+        </InfoSection>
+        <InfoSection title="Your Rights" colors={colors}>
+          <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd }}>Since all data is stored locally, you have full control. Delete at any time by clearing app data or uninstalling.</Text>
+        </InfoSection>
       </InfoModal>
 
       {/* Help Modal */}
       <InfoModal visible={showHelp} onClose={() => setShowHelp(false)} title="Help & Support" colors={colors}>
-        <InfoSection title="How to Search" colors={colors}>Tap the Search tab and type a song name, artist, or album. You can also tap genre cards to browse by category.</InfoSection>
-        <InfoSection title="Playing Music" colors={colors}>Tap any song to start playback. Use the mini player at the bottom, or tap it for the full-screen player.</InfoSection>
-        <InfoSection title="Managing Playlists" colors={colors}>Go to Library → Playlists to create a new playlist. Add songs from search results or your library.</InfoSection>
-        <InfoSection title="Favorites" colors={colors}>Tap the heart icon on any song to add it to favorites. Access all favorites from Library or Home.</InfoSection>
+        <InfoSection title="Contact the Developer" colors={colors}>
+          <Text style={{ fontWeight: '700', color: colors.onSurface, fontSize: FontSizes.bodyLg, marginBottom: Spacing.sm }}>Eslam Mahmoud</Text>
+          <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd, marginBottom: Spacing.xl }}>Mobile Applications Engineer</Text>
+          
+          <TouchableOpacity style={s.contactRow} onPress={() => handleOpenLink('mailto:xdev.eslam@gmail.com')}>
+            <Ionicons name="mail" size={20} color={colors.primary} />
+            <Text style={s.contactLink}>Email: xdev.eslam@gmail.com</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={s.contactRow} onPress={() => handleOpenLink('tel:+201122299831')}>
+            <Ionicons name="call" size={20} color={colors.primary} />
+            <Text style={s.contactLink}>Phone: +20 1122299831</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={s.contactRow} onPress={() => handleOpenLink('https://linkedin.com/in/deveslam-mahmoud')}>
+            <Ionicons name="logo-linkedin" size={20} color={colors.primary} />
+            <Text style={s.contactLink}>LinkedIn: Profile</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={s.contactRow} onPress={() => handleOpenLink('https://github.com/DevEslam1')}>
+            <Ionicons name="logo-github" size={20} color={colors.primary} />
+            <Text style={s.contactLink}>GitHub: DevEslam1</Text>
+          </TouchableOpacity>
+        </InfoSection>
+        <InfoSection title="Quick Guide" colors={colors}>
+          <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd, marginBottom: Spacing.xs }}>• Search: Tap Search tab to find music.</Text>
+          <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd, marginBottom: Spacing.xs }}>• Offline: Use cloud icon to download.</Text>
+          <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd, marginBottom: Spacing.xs }}>• Library: Manage your music & lists.</Text>
+        </InfoSection>
       </InfoModal>
 
       {/* About Modal */}
-      <InfoModal visible={showAbout} onClose={() => setShowAbout(false)} title="About" colors={colors}>
+      <InfoModal visible={showAbout} onClose={() => setShowAbout(false)} title="About the Developer" colors={colors}>
         <View style={s.aboutHeader}>
           <LinearGradient colors={[colors.primary, colors.secondary]} style={s.aboutIconRing}>
             <View style={s.aboutIconInner}><Ionicons name="musical-notes" size={28} color={colors.primary} /></View>
           </LinearGradient>
-          <Text style={s.aboutAppName}>GIG Music Player</Text>
-          <Text style={s.aboutVersion}>Version 1.0.0</Text>
+          <Text style={s.aboutAppName}>Eslam Mahmoud</Text>
+          <Text style={s.aboutVersion}>Mobile Applications Engineer</Text>
         </View>
-        <InfoSection title="About the App" colors={colors}>A modern music streaming app built with React Native and Expo, connecting to the Deezer API.</InfoSection>
-        <InfoSection title="Tech Stack" colors={colors}>React Native 0.81 • Expo SDK 54 • React Navigation • expo-av • TypeScript</InfoSection>
-        <InfoSection title="Design System" colors={colors}>Powered by Sonic Noir — a dual-mode palette with vibrant purple and cyan accents.</InfoSection>
+        <InfoSection title="Professional Summary" colors={colors}>
+          <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd, lineHeight: 22 }}>Cross-platform Mobile Developer with 1+ year of hands-on experience building scalable applications using Flutter, React Native, and Clean Architecture. Passionate about performance optimization and exceptional UI/UX.</Text>
+        </InfoSection>
+        <InfoSection title="Technical Expertise" colors={colors}>
+          <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd }}>Expertise in React Native, Flutter, BLoC, Provider, Firebase, and Clean Architecture. Developer of production-ready apps like Maysur and Free Zone.</Text>
+        </InfoSection>
+        <InfoSection title="Education" colors={colors}>
+          <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd }}>B.Sc. in Mechatronics Engineering, Mansoura University (June 2022). Technical excellence award winner.</Text>
+        </InfoSection>
       </InfoModal>
     </ScrollView>
   );
@@ -139,18 +185,41 @@ function MenuItem({ icon, label, colors, onPress }: { icon: keyof typeof Ionicon
 }
 
 function InfoModal({ visible, onClose, title, colors, children }: { visible: boolean; onClose: () => void; title: string; colors: ColorPalette; children: React.ReactNode }) {
+  const insets = useSafeAreaInsets();
+  
   return (
-    <Modal visible={visible} animationType="slide" transparent>
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' }}>
-        <View style={{ backgroundColor: colors.surfaceContainerLow, borderTopLeftRadius: Radii['2xl'], borderTopRightRadius: Radii['2xl'], maxHeight: '85%', paddingBottom: 40 }}>
+    <Modal visible={visible} animationType="slide" transparent statusBarTranslucent>
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' }}>
+        <TouchableOpacity activeOpacity={1} onPress={onClose} style={StyleSheet.absoluteFill} />
+        
+        <View 
+          style={{ 
+            backgroundColor: colors.surfaceContainerLow, 
+            borderTopLeftRadius: Radii['3xl'], 
+            borderTopRightRadius: Radii['3xl'], 
+            maxHeight: '90%',
+            width: '100%',
+          }}
+        >
           <View style={{ width: 40, height: 4, borderRadius: 2, backgroundColor: colors.outlineVariant, alignSelf: 'center', marginTop: Spacing.md }} />
+          
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: Spacing.xl, paddingTop: Spacing.lg, paddingBottom: Spacing.md }}>
             <Text style={{ color: colors.onSurface, fontSize: FontSizes.titleLg, fontWeight: '700' }}>{title}</Text>
             <TouchableOpacity onPress={onClose} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.surfaceContainer, justifyContent: 'center', alignItems: 'center' }}>
               <Ionicons name="close" size={22} color={colors.onSurface} />
             </TouchableOpacity>
           </View>
-          <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: Spacing.xl, paddingBottom: Spacing.xl }} showsVerticalScrollIndicator={false}>{children}</ScrollView>
+
+          <ScrollView 
+            style={{ maxHeight: 600 }}
+            contentContainerStyle={{ 
+              paddingHorizontal: Spacing.xl, 
+              paddingBottom: insets.bottom + Spacing.xl 
+            }}
+            showsVerticalScrollIndicator={false}
+          >
+            {children}
+          </ScrollView>
         </View>
       </View>
     </Modal>
@@ -160,15 +229,15 @@ function InfoModal({ visible, onClose, title, colors, children }: { visible: boo
 function InfoSection({ title, colors, children }: { title: string; colors: ColorPalette; children: React.ReactNode }) {
   return (
     <View style={{ marginBottom: Spacing.xl }}>
-      <Text style={{ color: colors.primary, fontSize: FontSizes.labelLg, fontWeight: '700', marginBottom: Spacing.xs }}>{title}</Text>
-      <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd, lineHeight: 22 }}>{children}</Text>
+      <Text style={{ color: colors.primary, fontSize: FontSizes.labelLg, fontWeight: '700', marginBottom: Spacing.sm }}>{title}</Text>
+      <View>{children}</View>
     </View>
   );
 }
 
 const makeStyles = (c: ColorPalette) => StyleSheet.create({
   container: { flex: 1, backgroundColor: c.background },
-  contentContainer: { paddingTop: 60 },
+  contentContainer: { paddingBottom: 140 },
   avatarSection: { alignItems: 'center', marginBottom: Spacing['3xl'] },
   avatarRing: { width: 100, height: 100, borderRadius: 50, padding: 3 },
   avatarInner: { flex: 1, borderRadius: 50, backgroundColor: c.surfaceContainer, justifyContent: 'center', alignItems: 'center' },
@@ -191,4 +260,6 @@ const makeStyles = (c: ColorPalette) => StyleSheet.create({
   aboutIconInner: { flex: 1, borderRadius: 32, backgroundColor: c.surfaceContainerLow, justifyContent: 'center', alignItems: 'center' },
   aboutAppName: { color: c.onSurface, fontSize: FontSizes.titleLg, fontWeight: '700', marginTop: Spacing.md },
   aboutVersion: { color: c.onSurfaceVariant, fontSize: FontSizes.labelMd, marginTop: Spacing.xs },
+  contactRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, paddingVertical: Spacing.md, borderBottomWidth: 1, borderBottomColor: c.outlineVariant + '22', marginBottom: Spacing.xs },
+  contactLink: { color: c.primary, fontSize: FontSizes.bodyMd, textDecorationLine: 'underline' },
 });
