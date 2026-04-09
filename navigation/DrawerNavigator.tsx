@@ -22,8 +22,8 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
           source={{ uri: user?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&q=80' }} 
           style={styles.avatar} 
         />
-        <Text style={[styles.userName, { color: colors.onSurface }]}>{user?.name || 'GIG User'}</Text>
-        <Text style={[styles.userEmail, { color: colors.onSurfaceVariant }]}>{user?.email || 'user@gig.com'}</Text>
+        <Text style={[styles.userName, { color: colors.onSurface }]}>{user?.name || 'BeatFlow User'}</Text>
+        <Text style={[styles.userEmail, { color: colors.onSurfaceVariant }]}>{user?.email || 'user@beatflow.app'}</Text>
       </View>
 
       <View style={{ flex: 1, paddingTop: Spacing.md }}>

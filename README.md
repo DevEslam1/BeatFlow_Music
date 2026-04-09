@@ -1,10 +1,10 @@
-# 🎵 GIG Music Player
+# 🎵 BeatFlow
 
 <p align="center">
-  <img src="./assets/images/app_icon.png" width="150" alt="App Icon" style="border-radius: 32px;" />
+  <img src="./assets/images/app_icon.jpg" width="150" alt="App Icon" style="border-radius: 32px;" />
 </p>
 
-A sleek, modern music streaming app built with **React Native** and **Expo**. GIG Music Player connects to the **Deezer API** to let you search, stream, and organize millions of tracks — all wrapped in a stunning dual-theme UI powered by the **Sonic Noir** design system.
+A sleek, modern music streaming app built with **React Native** and **Expo**. BeatFlow connects to the **Deezer API** to let you search, stream, and organize millions of tracks — all wrapped in a stunning dual-theme UI powered by the **Sonic Noir** design system.
 
 ---
 
@@ -34,7 +34,6 @@ A sleek, modern music streaming app built with **React Native** and **Expo**. GI
 - **Custom Branded Sidebar** — Featuring user profile details (avatar, name, email) and app branding.
 - **Dynamic Toggle** — Hamburger menu icon integrated into all main screen headers for easy sidebar access.
 - **Composite Routing** — Seamlessly combines Drawer navigation with existing Bottom Tabs for a professional feel.
-
 
 
 
@@ -117,7 +116,7 @@ A sleek, modern music streaming app built with **React Native** and **Expo**. GI
 ## 📂 Project Structure
 
 ```
-GIG_Music_Player/
+BeatFlow/
 ├── screens/                 # All application screens
 │   ├── HomeScreen.tsx       # Home — greeting, recently played, favorites, trending
 │   ├── SearchScreen.tsx     # Search — real-time search, genre browse, filters
@@ -153,7 +152,7 @@ GIG_Music_Player/
 ├── App.tsx                  # Root component (Providers & Root Navigation)
 ├── hooks/                   # Custom hooks for theme and system integration
 │   ├── use-color-scheme.ts  # Standardizes OS color scheme access
-│   └── use-theme-color.ts   # Bridges custom GIG palette with template components
+│   └── use-theme-color.ts   # Bridges custom BeatFlow palette with template components
 └── babel.config.js          # Babel config with strict path aliases (@/ -> ./)
 ```
 
@@ -172,8 +171,8 @@ GIG_Music_Player/
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/GIG_Music_Player.git
-cd GIG_Music_Player
+git clone https://github.com/DevEslam1/BeatFlow.git
+cd BeatFlow
 
 # Install dependencies
 npm install
@@ -196,7 +195,7 @@ npx expo start
 
 ## 🎶 API
 
-GIG Music Player uses the **[Deezer Public API](https://developers.deezer.com/api)** — no API key required.
+BeatFlow uses the **[Deezer Public API](https://developers.deezer.com/api)** — no API key required.
 
 | Endpoint               | Usage                    |
 | ---------------------- | ------------------------ |

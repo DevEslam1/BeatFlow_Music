@@ -58,7 +58,7 @@ export default function SignupScreen() {
 
         <Text style={s.title}>Create Account</Text>
         <Text style={s.subtitle}>
-          Join GIG Music Player and start listening
+          Join BeatFlow and start listening
         </Text>
 
         <View style={s.form}>

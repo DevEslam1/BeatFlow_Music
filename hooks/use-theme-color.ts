@@ -13,7 +13,7 @@ export function useThemeColor(
 
   if (override) return override;
 
-  // Map standard Expo color names to the GIG palette
+  // Map standard Expo color names to the BeatFlow palette
   switch (colorName) {
     case 'background':
       return colors.background;

@@ -1,29 +1,29 @@
 {
   "expo": {
-    "name": "GIG_Music_Player",
-    "slug": "GIG_Music_Player",
+    "name": "BeatFlow",
+    "slug": "BeatFlow",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/app_icon.png",
-    "scheme": "gigmusicplayer",
+    "icon": "./assets/images/app_icon.jpg",
+    "scheme": "beatflow",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.deveslam.gigmusicplayer",
+      "bundleIdentifier": "com.deveslam.beatflow",
       "infoPlist": {
         "UIBackgroundModes": [
           "audio"
         ],
-        "NSPhotoLibraryUsageDescription": "GIG Music Player needs access to your local music to build your library."
+        "NSPhotoLibraryUsageDescription": "BeatFlow needs access to your local music to build your library."
       }
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#121212",
-        "foregroundImage": "./assets/images/app_icon.png",
-        "backgroundImage": "./assets/images/app_icon.png",
-        "monochromeImage": "./assets/images/app_icon.png"
+        "foregroundImage": "./assets/images/app_icon.jpg",
+        "backgroundImage": "./assets/images/app_icon.jpg",
+        "monochromeImage": "./assets/images/app_icon.jpg"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -37,29 +37,19 @@
         "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
         "android.permission.READ_MEDIA_IMAGES",
         "android.permission.READ_MEDIA_VIDEO",
-        "android.permission.READ_MEDIA_AUDIO",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "ACCESS_MEDIA_LOCATION",
-        "READ_MEDIA_AUDIO",
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
-        "android.permission.READ_MEDIA_IMAGES",
-        "android.permission.READ_MEDIA_VIDEO",
         "android.permission.READ_MEDIA_AUDIO"
       ],
-      "package": "com.deveslam.gigmusicplayer"
+      "package": "com.deveslam.beatflow"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/app_icon.png"
+      "favicon": "./assets/images/app_icon.jpg"
     },
     "plugins": [
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/app_icon.png",
+          "image": "./assets/images/app_icon.jpg",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#121212",
@@ -71,8 +61,8 @@
       [
         "expo-media-library",
         {
-          "photosPermission": "GIG Music Player needs access to your local music to build your library.",
-          "savePhotosPermission": "Allow GIG Music Player to save music files."
+          "photosPermission": "BeatFlow needs access to your local music to build your library.",
+          "savePhotosPermission": "Allow BeatFlow to save music files."
         }
       ]
     ],

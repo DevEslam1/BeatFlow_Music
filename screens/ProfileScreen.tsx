@@ -110,7 +110,7 @@ export default function ProfileScreen() {
 
       <InfoModal visible={showPrivacy} onClose={() => setShowPrivacy(false)} title="Privacy Policy" colors={colors}>
         <InfoSection title="Data Collection" colors={colors}>
-          <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd }}>GIG Music Player does not collect, store, or transmit any personal data to external servers. All your data is stored locally on your device using AsyncStorage.</Text>
+          <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd }}>BeatFlow does not collect, store, or transmit any personal data to external servers. All your data is stored locally on your device using AsyncStorage.</Text>
         </InfoSection>
         <InfoSection title="Third-Party Services" colors={colors}>
           <Text style={{ color: colors.onSurfaceVariant, fontSize: FontSizes.bodyMd }}>We use the Deezer public API to fetch music metadata and 30-second previews. No personal information is shared with Deezer.</Text>

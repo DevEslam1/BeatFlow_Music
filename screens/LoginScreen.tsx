@@ -61,7 +61,7 @@ export default function LoginScreen() {
               color={colors.onPrimaryFixed}
             />
           </LinearGradient>
-          <Text style={s.appName}>GIG</Text>
+          <Text style={s.appName}>BeatFlow</Text>
           <Text style={s.tagline}>Your music, your vibe</Text>
         </View>
 

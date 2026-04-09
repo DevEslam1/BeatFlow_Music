@@ -75,7 +75,7 @@ export default function PlayerScreen() {
     try {
       if (!currentSong) return;
       const url = currentSong.uri || currentSong.previewUrl;
-      const message = `Check out "${currentSong.name}" by ${currentSong.artist} on GIG! ${url}`;
+      const message = `Check out "${currentSong.name}" by ${currentSong.artist} on BeatFlow! ${url}`;
       await Share.share({
         message,
         title: `Share ${currentSong.name}`,
