@@ -42,7 +42,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [recentlyPlayed, setRecentlyPlayed] = useState<Song[]>([]);
   const playerRef = useRef<AudioPlayer | null>(null);
   const statusSubscriptionRef = useRef<{ remove: () => void } | null>(null);
-  const loadSequenceRef = useRef(0);
   const handleSongFinishRef = useRef<() => Promise<void>>(async () => {});
   const downloadsRef = useRef<Song[]>([]);
   const isOfflineRef = useRef(false);
@@ -78,11 +77,44 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     repeatRef.current = repeat;
   }, [repeat]);
 
+  const ensurePlayer = useCallback(() => {
+    if (playerRef.current) {
+      return playerRef.current;
+    }
+
+    const player = createAudioPlayer(null, {
+      updateInterval: PLAYER_UPDATE_INTERVAL,
+    });
+
+    const subscription = player.addListener('playbackStatusUpdate', (status: AudioStatus) => {
+      if (!status.isLoaded) {
+        return;
+      }
+
+      setPosition(Math.round(status.currentTime * 1000));
+      setDuration(Math.round(status.duration * 1000));
+      setIsPlaying(status.playing);
+
+      if (status.didJustFinish) {
+        void handleSongFinishRef.current();
+      }
+    });
+
+    playerRef.current = player;
+    statusSubscriptionRef.current = subscription;
+    return player;
+  }, []);
+
   const cleanupPlayer = useCallback(() => {
     statusSubscriptionRef.current?.remove();
     statusSubscriptionRef.current = null;
 
     if (playerRef.current) {
+      try {
+        playerRef.current.pause();
+      } catch {
+        // Ignore player cleanup errors during teardown.
+      }
       playerRef.current.remove();
       playerRef.current = null;
     }
@@ -118,36 +150,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const currentSequence = ++loadSequenceRef.current;
-      cleanupPlayer();
-
-      const player = createAudioPlayer(
-        { uri: urlToPlay },
-        { updateInterval: PLAYER_UPDATE_INTERVAL }
-      );
-
-      const subscription = player.addListener('playbackStatusUpdate', (status: AudioStatus) => {
-        if (currentSequence !== loadSequenceRef.current || !status.isLoaded) {
-          return;
-        }
-
-        setPosition(Math.round(status.currentTime * 1000));
-        setDuration(Math.round(status.duration * 1000));
-        setIsPlaying(status.playing);
-
-        if (status.didJustFinish) {
-          void handleSongFinishRef.current();
-        }
-      });
-
-      if (currentSequence !== loadSequenceRef.current) {
-        subscription.remove();
-        player.remove();
-        return;
-      }
-
-      playerRef.current = player;
-      statusSubscriptionRef.current = subscription;
+      const player = ensurePlayer();
+      player.pause();
+      player.replace({ uri: urlToPlay });
       queueIndexRef.current = index;
       setCurrentSong(song);
       setQueueIndex(index);
@@ -164,7 +169,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error loading audio:', error);
     }
-  }, [cleanupPlayer]);
+  }, [ensurePlayer]);
 
   const handleSongFinish = useCallback(async () => {
     const player = playerRef.current;
