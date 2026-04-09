@@ -1,250 +1,166 @@
-# 🎵 BeatFlow
+# BeatFlow
 
 <p align="center">
-  <img src="./assets/images/app_icon.jpg" width="150" alt="App Icon" style="border-radius: 32px;" />
+  <img src="./assets/images/app_icon.jpg" width="120" alt="BeatFlow app icon" />
 </p>
 
-A sleek, modern music streaming app built with **React Native** and **Expo**. BeatFlow connects to the **Deezer API** to let you search, stream, and organize millions of tracks — all wrapped in a stunning dual-theme UI powered by the **Sonic Noir** design system.
+BeatFlow is a React Native music player built with Expo. It combines Deezer preview streaming, offline downloads, local audio scanning, playlist management, and a polished mobile UI in one portfolio app.
 
----
+The goal of this project is to show practical mobile engineering skills:
 
-## ✨ Features
+- building a multi-screen app with React Navigation
+- managing app-wide state with React Context
+- handling audio playback, queueing, and background behavior
+- supporting offline scenarios and local device media
+- shipping a consistent UI across authentication, library, player, and profile flows
 
-### 🎧 Music Playback
+## Screenshots
 
-- **Stream 30-second previews** from the Deezer catalog via `expo-audio`
-- **Full playback controls** — play, pause, skip, seek with a draggable progress bar
-- **Shuffle & Repeat** modes (off → all → one)
-- **Queue management** — songs are automatically queued from any list you play
-- **Background audio** support (stays active in background & silent mode on iOS via `UIBackgroundModes`)
-- **Mini Player** — persistent, floating mini player across all tabs
-- **Smart Play/Pause** — Selecting a song that is already "Now Playing" will toggle playback (Play ⇋ Pause) instead of reloading it from the beginning
-- **Active Song Indicators** — Visual "playing" animation overlay and Title color change for the active song across all lists (Trending, Search, Favorites, etc.)
-- **Share** your favorite tracks directly using the native share sheet
-- **Downloads & Offline Support** — save songs to local storage and enjoy seamless offline playback when you lose internet connection
-- **Safe Area Support** — Adaptive UI that perfectly fits all device notches and home indicators
-- **Smooth Transitions** — `ios_from_right` global navigation and `fade_from_bottom` player entrance
-- **Shared Element Transitions** — Album art gracefully "morphs" between Mini Player and Full Player
-- **Staggered Animations** — Song list items slide in with a fluid, staggered entrance effect
-- **Full-Screen Gestures** — Swipe down from anywhere on the player to minimize it back to the bar
+<p align="center">
+  <img src="./ss/loginpage.png" width="220" alt="Login screen" />
+  <img src="./ss/homepage.png" width="220" alt="Home screen" />
+  <img src="./ss/playerpage.png" width="220" alt="Player screen" />
+</p>
 
-### 🗺️ Navigation & Sidebar
+<p align="center">
+  <img src="./ss/drawerpage.png" width="220" alt="Drawer navigation" />
+  <img src="./ss/profilepage.png" width="220" alt="Profile screen" />
+  <img src="./ss/localplayer%20page.png" width="220" alt="Local player screen" />
+</p>
 
-- **Drawer Navigation** — A premium sidebar menu (Drawer) for high-level app navigation.
-- **Custom Branded Sidebar** — Featuring user profile details (avatar, name, email) and app branding.
-- **Dynamic Toggle** — Hamburger menu icon integrated into all main screen headers for easy sidebar access.
-- **Composite Routing** — Seamlessly combines Drawer navigation with existing Bottom Tabs for a professional feel.
+## What The App Does
 
+- Streams 30-second Deezer previews with play, pause, seek, skip, shuffle, and repeat controls
+- Shows a persistent mini player across the main app
+- Supports favorites, playlists, recent tracks, and downloads
+- Detects connectivity and blocks online playback while offline
+- Scans local device audio files and lets users play them inside the same player experience
+- Supports light, dark, and system theme modes
 
+## Tech Stack
 
-### 🔍 Search & Discovery
+| Area | Choice |
+| --- | --- |
+| Framework | React Native 0.81 |
+| Runtime | Expo SDK 54 |
+| Language | TypeScript |
+| Navigation | React Navigation 7 |
+| Audio | `expo-audio` |
+| Media Access | `expo-media-library` |
+| Persistence | `@react-native-async-storage/async-storage`, `expo-file-system` |
+| Network Awareness | `@react-native-community/netinfo` |
+| UI | `expo-image`, `expo-linear-gradient`, `expo-blur`, `expo-haptics` |
+| State Management | React Context |
 
-- **Real-time search** — instant results as you type (songs, artists, albums)
-- **Trending charts** — top tracks from Deezer displayed on the Home screen
-- **Genre browsing** — quick-tap genre cards (Pop, Rock, Hip-Hop, R&B, Electronic, Jazz)
-- **Filter chips** — narrow results by category
+## Architecture Summary
 
-### 📚 Library Management
+The app is organized by feature-focused layers:
 
-- **Songs tab** — browse all available tracks with sort by name or artist
-- **Playlists tab** — create, rename, and delete custom playlists
-- **Favorites tab** — one-tap heart to save/unsave any song
-- **Downloads tab** — acts as your local hub for all saved offline music
-- **Search within library** — filter your personal collection
+- `screens/`: user-facing views such as Home, Search, Library, Player, Auth, and Profile
+- `components/`: reusable UI such as the mini player and song list item
+- `contexts/`: shared app state for auth, playback, playlists, theme, local tracks, and network status
+- `services/`: API calls and shared data types
+- `navigation/`: stack, tab, and drawer navigation definitions
+- `constants/`: design tokens and theme values
 
-### 📁 Local Media Library
+This structure keeps UI, business logic, and shared state separated well enough for a medium-sized mobile app without adding unnecessary abstraction.
 
-- **Automatic Media Scanning** — Scans your device for local `.mp3` and audio files via `expo-media-library`.
-- **Smart Classification** — Automatically organizes your local music into **Songs**, **Artists**, **Albums**, and **Folders**.
-- **Offline Playback** — Play your personal local files without needing an internet connection.
-- **Seamless Integration** — Local tracks work with the same player controls and mini-player as streamed tracks.
-- **Permission Management** — Built-in support for requesting and handling device storage permissions.
+## Key Engineering Areas
 
-### 👤 User Profile & Settings
+### Playback
 
-- **Authentication** — sign up & login with local persistence via `AsyncStorage`
-- **Network Awareness** — real-time detection of connectivity to block online streams when offline
-- **iOS Optimized** — pre-configured for background audio and silent mode playback
-- **Haptic Feedback** — Tactile confirmation for likes and downloads via `expo-haptics`
-- **User stats** — favorites count, playlist count, songs played
+- Queue-based playback with current track state, seeking, repeat, and shuffle
+- Shared player state across screens through `PlayerContext`
+- Background audio support configured for mobile playback use cases
 
+### Offline And Local Media
 
-- **Dynamic Theme Engine** — instantly toggle between Dark, Light, and System modes
-- **Information Modals** — accessible panels for Privacy Policy, Help & Support, and About info
+- Offline mode detection using NetInfo
+- Downloaded audio playback from local storage
+- Device media scanning and classification for local tracks
 
-### 🛠️ Personalization & Support
+### UI And Navigation
 
-- **Developer Profile** — Dedicated "About the Developer" section featuring **Eslam Mahmoud**'s professional portfolio and technical expertise.
-- **Interactive Support** — Clickable contact links in the "Help & Support" section for instant Email, Phone, LinkedIn, and GitHub access.
-- **Brand Integration** — Official branding icons for Gmail, LinkedIn, and GitHub for a premium, production-ready feel.
-- **Smooth Modals** — High-end bottom sheet modals with `3xl` rounded corners and interactive backdrop-to-close gestures.
+- Drawer plus bottom tabs plus stack navigation
+- Theme-aware styling across screens
+- Mini player that stays visible while users move through the app
 
-### 🎨 Design
+## Current Product Scope
 
-- **Sonic Noir** dynamic theme with vibrant purple/cyan (`#de8eff`/`#00f4fe`) accents
-- **Premium Aesthetics** — modern `3xl` corner radii (32pt) for cards and modals, creating a soft, high-end look
-- **Glassmorphism Lite** — subtle blur effects on Mini Player and overlay components
-- **Gradient accents** — linear gradients on play button, progress bar, avatar ring, and brand accents
-- **Edge-to-edge** layout on Android with `edgeToEdgeEnabled` and full safe area support on iOS
+This is a portfolio project, not a production service. A few parts are intentionally lightweight:
 
----
+- Authentication is local/demo-oriented rather than backed by a real auth provider
+- Streaming uses Deezer preview URLs, not full licensed playback
+- The project currently focuses more on mobile product quality than backend depth
 
-## 🏗️ Tech Stack
+Being explicit about that scope makes the repo more credible than pretending it is already production-ready.
 
-| Layer            | Technology                                                  |
-| ---------------- | ----------------------------------------------------------- |
-| **Framework**    | React Native 0.81 + Expo SDK 54                             |
-| **Navigation**   | React Navigation 7 (Native Stack, Bottom Tabs, Drawer)       |
-| **Animations**   | react-native-reanimated                                     |
-| **Audio**        | expo-audio, expo-media-library                              |
-
-| **API**          | Deezer Public API                                           |
-| **State**        | React Context (Auth, Player, Playlist, Theme, Network)      |
-| **Persistence**  | @react-native-async-storage/async-storage                   |
-| **File System**  | expo-file-system                                            |
-| **Network**      | @react-native-community/netinfo                             |
-| **Safe Area**    | react-native-safe-area-context                              |
-| **Images**       | expo-image                                                  |
-
-| **UI Effects**   | expo-linear-gradient, expo-blur, expo-haptics, expo-linking |
-| **Language**     | TypeScript 5.9                                              |
-| **Architecture** | React New Architecture enabled                              |
-| **Developer**    | **Eslam Mahmoud** — Mobile Applications Engineer            |
-
----
-
-## 📂 Project Structure
-
-```
-BeatFlow/
-├── screens/                 # All application screens
-│   ├── HomeScreen.tsx       # Home — greeting, recently played, favorites, trending
-│   ├── SearchScreen.tsx     # Search — real-time search, genre browse, filters
-│   ├── LibraryScreen.tsx    # Library — Songs / Playlists / Favorites tabs
-│   ├── LocalTracksScreen.tsx # Local Library — classified local audio assets
-│   ├── ProfileScreen.tsx    # Profile — avatar, theme toggle, info modals, logout
-│   ├── PlaylistDetailScreen.tsx   # Playlist detail — play all, shuffle, song list
-│   ├── CreatePlaylistScreen.tsx   # Create new playlist form
-│   ├── LoginScreen.tsx      # Login screen
-│   ├── SignupScreen.tsx     # Sign-up screen
-│   ├── PlayerScreen.tsx     # Full-screen Now Playing
-│   ├── FavoritesScreen.tsx  # Dedicated favorites screen
-│   └── RecentScreen.tsx     # Recently played history
-├── navigation/
-│   ├── DrawerNavigator.tsx  # Main sidebar navigator wrapping the app
-│   ├── TabNavigator.tsx     # Bottom tab navigator + MiniPlayer overlay
-│   └── types.ts             # TypeScript types for all navigation stacks
-├── components/
-│   ├── MiniPlayer.tsx       # Floating mini player with playback controls
-│   └── SongItem.tsx         # Reusable song row component
-├── contexts/
-│   ├── AuthContext.tsx       # Authentication state & persistence
-│   ├── LocalTracksContext.tsx # Local device media scanning & classification
-│   ├── NetworkContext.tsx    # Connection state & offline checks
-│   ├── PlayerContext.tsx     # Audio playback engine & queue state
-│   ├── PlaylistContext.tsx   # Playlists, favorites, downloads & persistence
-│   └── ThemeContext.tsx      # Dual-mode theme state (Light/Dark/System)
-├── services/
-│   ├── api.ts               # Deezer API client (search, charts, tracks, artists)
-│   └── types.ts             # TypeScript interfaces (Song, Playlist, User, etc.)
-├── constants/
-│   └── theme.ts             # Sonic Noir design tokens (Light/Dark ColorPalettes)
-├── App.tsx                  # Root component (Providers & Root Navigation)
-├── hooks/                   # Custom hooks for theme and system integration
-│   ├── use-color-scheme.ts  # Standardizes OS color scheme access
-│   └── use-theme-color.ts   # Bridges custom BeatFlow palette with template components
-└── babel.config.js          # Babel config with strict path aliases (@/ -> ./)
-```
-
----
-
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
-- **Node.js** ≥ 18
-- **npm** or **yarn**
-- **Expo CLI** — installed globally or via `npx`
-- **Android Studio** (for Android emulator) or a physical device with **Expo Go**
+- Node.js 18 or newer
+- npm
+- Android Studio emulator, iOS simulator, or Expo Go
 
-### Installation
+### Install
 
 ```bash
-# Clone the repository
 git clone https://github.com/DevEslam1/BeatFlow.git
 cd BeatFlow
-
-# Install dependencies
 npm install
-
-# Start the development server
-npx expo start
 ```
 
-### Running on a Device
+### Run
 
-| Platform | Command                    |
-| -------- | -------------------------- |
-| Android  | `npx expo start --android` |
-| iOS      | `npx expo start --ios`     |
-| Web      | `npx expo start --web`     |
+```bash
+npm run start
+```
 
-> **Tip:** Scan the QR code in your terminal with the **Expo Go** app on your phone for the fastest setup.
+Then launch one of:
 
----
+- `npm run android`
+- `npm run ios`
+- `npm run web`
 
-## 🎶 API
+## API
 
-BeatFlow uses the **[Deezer Public API](https://developers.deezer.com/api)** — no API key required.
+BeatFlow uses the [Deezer Public API](https://developers.deezer.com/api).
 
-| Endpoint               | Usage                    |
-| ---------------------- | ------------------------ |
-| `GET /search?q=`       | Search songs by query    |
-| `GET /chart/0/tracks`  | Fetch trending tracks    |
-| `GET /track/{id}`      | Get single track details |
-| `GET /artist/{id}/top` | Get artist's top tracks  |
+Main endpoints used:
 
----
+- `GET /search?q=`
+- `GET /chart/0/tracks`
+- `GET /track/{id}`
+- `GET /artist/{id}/top`
 
-## 🎨 Design System — Sonic Noir
+## What I Would Improve Next
 
-| Token        | Description                                               |
-| ------------ | --------------------------------------------------------- |
-| Philosophy   | A stark, premium two-tone system                          |
-| Themes       | Supported `light` and `dark` with automatic OS sync       |
-| Primary      | `#de8eff` (vibrant purple)                                |
-| Secondary    | `#00f4fe` (electric cyan)                                 |
-| Typography   | System default native fonts                               |
-| Corner Radii | Pill-drops to soft squares                                |
+- Replace local demo auth with a real backend or hosted auth provider
+- Add automated tests for contexts and service functions
+- Add CI for linting and test execution
+- Reduce Android permissions to the minimum required set
+- Remove leftover template files and unused dependencies
 
----
+## Project Structure
 
-## 📄 License
+```text
+BeatFlow/
+|-- screens/
+|-- components/
+|-- contexts/
+|-- navigation/
+|-- services/
+|-- constants/
+|-- assets/
+|-- ss/
+|-- App.tsx
+|-- app.json
+`-- package.json
+```
 
-This project is private and not licensed for public distribution.
+## Contact
 
----
-
----
-
-## 📬 Contact
-
-<p align="center">
-  <a href="mailto:xdev.eslam@gmail.com">
-    <img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail" />
-  </a>
-  <a href="https://linkedin.com/in/deveslam-mahmoud">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn" />
-  </a>
-  <a href="https://github.com/DevEslam1">
-    <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" />
-  </a>
-</p>
-
-**Eslam Mahmoud** — *Mobile Applications Engineer*
-
----
-
-<p align="center">
-  Built with ❤️ by **Eslam Mahmoud**
-</p>
+- Email: `xdev.eslam@gmail.com`
+- LinkedIn: [linkedin.com/in/deveslam-mahmoud](https://linkedin.com/in/deveslam-mahmoud)
+- GitHub: [github.com/DevEslam1](https://github.com/DevEslam1)
