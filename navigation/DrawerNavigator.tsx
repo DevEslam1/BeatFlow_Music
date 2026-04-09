@@ -1,12 +1,14 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerContentComponentProps } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItem, DrawerContentComponentProps } from '@react-navigation/drawer';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { DrawerParamList } from './types';
 import TabNavigator from './TabNavigator';
 import LocalTracksScreen from '@/screens/LocalTracksScreen';
+import SettingsScreen from '@/screens/SettingsScreen';
+import FAQScreen from '@/screens/FAQScreen';
 import { Spacing, Radii, FontSizes } from '@/constants/theme';
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
@@ -14,6 +16,19 @@ const Drawer = createDrawerNavigator<DrawerParamList>();
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const { colors } = useTheme();
   const { user, logout } = useAuth();
+  const activeDrawerRoute = props.state.routes[props.state.index]?.name;
+  const parentState = props.navigation.getParent()?.getState();
+  const activeRootRoute = parentState?.routes[parentState.index ?? 0]?.name;
+
+  const openDrawerRoute = (routeName: keyof DrawerParamList) => {
+    props.navigation.closeDrawer();
+    props.navigation.navigate(routeName);
+  };
+
+  const handleOpenRecent = () => {
+    props.navigation.closeDrawer();
+    props.navigation.getParent()?.navigate('Recent' as never);
+  };
 
   return (
     <DrawerContentScrollView {...props} contentContainerStyle={{ flex: 1, backgroundColor: colors.background }}>
@@ -27,7 +42,61 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
       </View>
 
       <View style={{ flex: 1, paddingTop: Spacing.md }}>
-        <DrawerItemList {...props} />
+        <DrawerItem
+          label="Home"
+          onPress={() => openDrawerRoute('MainTabs')}
+          focused={activeDrawerRoute === 'MainTabs'}
+          icon={({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />}
+          activeTintColor={colors.primary}
+          inactiveTintColor={colors.onSurfaceVariant}
+          activeBackgroundColor={colors.surfaceContainerHigh}
+          style={styles.customDrawerItem}
+          labelStyle={styles.customDrawerLabel}
+        />
+        <DrawerItem
+          label="Local Library"
+          onPress={() => openDrawerRoute('LocalTracks')}
+          focused={activeDrawerRoute === 'LocalTracks'}
+          icon={({ color, size }) => <Ionicons name="musical-notes-outline" size={size} color={color} />}
+          activeTintColor={colors.primary}
+          inactiveTintColor={colors.onSurfaceVariant}
+          activeBackgroundColor={colors.surfaceContainerHigh}
+          style={styles.customDrawerItem}
+          labelStyle={styles.customDrawerLabel}
+        />
+        <DrawerItem
+          label="Recent"
+          onPress={handleOpenRecent}
+          focused={activeRootRoute === 'Recent'}
+          icon={({ color, size }) => <Ionicons name="time-outline" size={size} color={color} />}
+          activeTintColor={colors.primary}
+          inactiveTintColor={colors.onSurfaceVariant}
+          activeBackgroundColor={colors.surfaceContainerHigh}
+          style={styles.customDrawerItem}
+          labelStyle={styles.customDrawerLabel}
+        />
+        <DrawerItem
+          label="Settings"
+          onPress={() => openDrawerRoute('Settings')}
+          focused={activeDrawerRoute === 'Settings'}
+          icon={({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />}
+          activeTintColor={colors.primary}
+          inactiveTintColor={colors.onSurfaceVariant}
+          activeBackgroundColor={colors.surfaceContainerHigh}
+          style={styles.customDrawerItem}
+          labelStyle={styles.customDrawerLabel}
+        />
+        <DrawerItem
+          label="FAQ"
+          onPress={() => openDrawerRoute('FAQ')}
+          focused={activeDrawerRoute === 'FAQ'}
+          icon={({ color, size }) => <Ionicons name="help-circle-outline" size={size} color={color} />}
+          activeTintColor={colors.primary}
+          inactiveTintColor={colors.onSurfaceVariant}
+          activeBackgroundColor={colors.surfaceContainerHigh}
+          style={styles.customDrawerItem}
+          labelStyle={styles.customDrawerLabel}
+        />
       </View>
 
       <TouchableOpacity 
@@ -88,10 +157,18 @@ export default function DrawerNavigator() {
       />
       <Drawer.Screen 
         name="Settings" 
-        component={View} // Placeholder for now
+        component={SettingsScreen}
         options={{
           title: 'Settings',
           drawerIcon: ({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />,
+        }}
+      />
+      <Drawer.Screen
+        name="FAQ"
+        component={FAQScreen}
+        options={{
+          title: 'FAQ',
+          drawerIcon: ({ color, size }) => <Ionicons name="help-circle-outline" size={size} color={color} />,
         }}
       />
     </Drawer.Navigator>
@@ -117,6 +194,16 @@ const styles = StyleSheet.create({
   },
   userEmail: {
     fontSize: FontSizes.bodySm,
+  },
+  customDrawerItem: {
+    borderRadius: Radii.full,
+    paddingHorizontal: Spacing.md,
+    marginVertical: 4,
+  },
+  customDrawerLabel: {
+    fontSize: FontSizes.labelLg,
+    fontWeight: '600',
+    marginLeft: -8,
   },
   logoutButton: {
     flexDirection: 'row',

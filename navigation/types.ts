@@ -8,6 +8,7 @@ export type DrawerParamList = {
   MainTabs: undefined;
   LocalTracks: undefined;
   Settings: undefined;
+  FAQ: undefined;
 };
 
 // ─── Auth Stack ───

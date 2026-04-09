@@ -3,27 +3,44 @@ import NetInfo from '@react-native-community/netinfo';
 
 interface NetworkContextType {
   isOffline: boolean;
+  isConnected: boolean;
+  isOfflineModeEnabled: boolean;
+  toggleOfflineMode: () => void;
 }
 
-const NetworkContext = createContext<NetworkContextType>({ isOffline: false });
+const NetworkContext = createContext<NetworkContextType>({
+  isOffline: false,
+  isConnected: true,
+  isOfflineModeEnabled: false,
+  toggleOfflineMode: () => {},
+});
 
 export function NetworkProvider({ children }: { children: React.ReactNode }) {
-  const [isOffline, setIsOffline] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
+  const [isOfflineModeEnabled, setIsOfflineModeEnabled] = useState(false);
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
-      setIsOffline(state.isConnected === false);
+      setIsConnected(state.isConnected !== false);
     });
 
     NetInfo.fetch().then(state => {
-      setIsOffline(state.isConnected === false);
+      setIsConnected(state.isConnected !== false);
     });
 
     return () => unsubscribe();
   }, []);
 
+  const toggleOfflineMode = () => {
+    setIsOfflineModeEnabled((prev) => !prev);
+  };
+
+  const isOffline = !isConnected || isOfflineModeEnabled;
+
   return (
-    <NetworkContext.Provider value={{ isOffline }}>
+    <NetworkContext.Provider
+      value={{ isOffline, isConnected, isOfflineModeEnabled, toggleOfflineMode }}
+    >
       {children}
     </NetworkContext.Provider>
   );
