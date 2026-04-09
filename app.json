@@ -64,6 +64,13 @@
           "photosPermission": "BeatFlow needs access to your local music to build your library.",
           "savePhotosPermission": "Allow BeatFlow to save music files."
         }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
       ]
     ],
     "experiments": {

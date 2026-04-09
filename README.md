@@ -12,7 +12,7 @@ A sleek, modern music streaming app built with **React Native** and **Expo**. Be
 
 ### 🎧 Music Playback
 
-- **Stream 30-second previews** from the Deezer catalog via `expo-av`
+- **Stream 30-second previews** from the Deezer catalog via `expo-audio`
 - **Full playback controls** — play, pause, skip, seek with a draggable progress bar
 - **Shuffle & Repeat** modes (off → all → one)
 - **Queue management** — songs are automatically queued from any list you play
@@ -96,7 +96,7 @@ A sleek, modern music streaming app built with **React Native** and **Expo**. Be
 | **Framework**    | React Native 0.81 + Expo SDK 54                             |
 | **Navigation**   | React Navigation 7 (Native Stack, Bottom Tabs, Drawer)       |
 | **Animations**   | react-native-reanimated                                     |
-| **Audio**        | expo-av, expo-media-library                                 |
+| **Audio**        | expo-audio, expo-media-library                              |
 
 | **API**          | Deezer Public API                                           |
 | **State**        | React Context (Auth, Player, Playlist, Theme, Network)      |
