@@ -20,6 +20,9 @@ import FavoritesScreen from '@/screens/FavoritesScreen';
 import RecentScreen from '@/screens/RecentScreen';
 import PlaylistDetailScreen from '@/screens/PlaylistDetailScreen';
 import CreatePlaylistScreen from '@/screens/CreatePlaylistScreen';
+import MiniPlayer from '@/components/MiniPlayer';
+import { navigationRef } from '@/navigation/RootNavigation';
+import { NavigationStateProvider, useNavigationStateContext } from '@/contexts/NavigationContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -75,6 +78,8 @@ function AppNavigator() {
   const { user, isLoading } = useAuth();
   const { colors, isDark } = useTheme();
 
+  const { setCurrentRouteName } = useNavigationStateContext();
+
   React.useEffect(() => {
     if (!isLoading) SplashScreen.hideAsync();
   }, [isLoading]);
@@ -91,6 +96,13 @@ function AppNavigator() {
     <>
       <StatusBar style={isDark ? 'light' : 'dark'} />
       <NavigationContainer
+        ref={navigationRef}
+        onReady={() => {
+          setCurrentRouteName(navigationRef.getCurrentRoute()?.name);
+        }}
+        onStateChange={() => {
+          setCurrentRouteName(navigationRef.getCurrentRoute()?.name);
+        }}
         theme={{
           dark: isDark,
           colors: {
@@ -109,27 +121,33 @@ function AppNavigator() {
           },
         }}
       >
-        {user ? <MainNavigator /> : <AuthNavigator />}
+        <View style={{ flex: 1 }}>
+          {user ? <MainNavigator /> : <AuthNavigator />}
+          {user && <MiniPlayer />}
+        </View>
       </NavigationContainer>
     </>
   );
 }
+
 export default function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <NetworkProvider>
-        <AuthProvider>
-          <PlaylistProvider>
-            <LocalTracksProvider>
-              <PlayerProvider>
-                <AppNavigator />
-              </PlayerProvider>
-            </LocalTracksProvider>
-          </PlaylistProvider>
-        </AuthProvider>
-      </NetworkProvider>
-    </ThemeProvider>
+        <NavigationStateProvider>
+          <NetworkProvider>
+            <AuthProvider>
+              <PlaylistProvider>
+                <LocalTracksProvider>
+                  <PlayerProvider>
+                    <AppNavigator />
+                  </PlayerProvider>
+                </LocalTracksProvider>
+              </PlaylistProvider>
+            </AuthProvider>
+          </NetworkProvider>
+        </NavigationStateProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

@@ -62,7 +62,7 @@ export function LocalTracksProvider({ children }: { children: React.ReactNode })
         const filename = asset.filename;
         const uri = asset.uri;
         const id = asset.id;
-        const duration = Math.round(asset.duration);
+        const duration = Math.round(asset.duration * 1000);
         
         // Extract folder name from URI (e.g., file:///storage/emulated/0/Music/track.mp3 -> Music)
         const pathSegments = uri.split('/');

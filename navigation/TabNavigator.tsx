@@ -76,9 +76,6 @@ export default function TabNavigator() {
           }}
         />
       </Tab.Navigator>
-      <View style={{ position: 'absolute', bottom: TAB_BAR_HEIGHT, left: 0, right: 0 }}>
-        <MiniPlayer />
-      </View>
     </View>
   );
 }
