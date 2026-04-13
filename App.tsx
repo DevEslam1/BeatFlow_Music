@@ -130,24 +130,28 @@ function AppNavigator() {
   );
 }
 
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <ThemeProvider>
-        <NavigationStateProvider>
-          <NetworkProvider>
-            <AuthProvider>
-              <PlaylistProvider>
-                <LocalTracksProvider>
-                  <PlayerProvider>
-                    <AppNavigator />
-                  </PlayerProvider>
-                </LocalTracksProvider>
-              </PlaylistProvider>
-            </AuthProvider>
-          </NetworkProvider>
-        </NavigationStateProvider>
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <NavigationStateProvider>
+            <NetworkProvider>
+              <AuthProvider>
+                <PlaylistProvider>
+                  <LocalTracksProvider>
+                    <PlayerProvider>
+                      <AppNavigator />
+                    </PlayerProvider>
+                  </LocalTracksProvider>
+                </PlaylistProvider>
+              </AuthProvider>
+            </NetworkProvider>
+          </NavigationStateProvider>
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

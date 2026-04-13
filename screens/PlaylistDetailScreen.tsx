@@ -10,11 +10,12 @@ import { usePlayer } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { PlaylistDetailRouteProp } from '@/navigation/types';
 import SongItem from '@/components/SongItem';
+import SwipeableItem from '@/components/SwipeableItem';
 
 export default function PlaylistDetailScreen() {
   const route = useRoute<PlaylistDetailRouteProp>();
   const { id } = route.params;
-  const { playlists, deletePlaylist, renamePlaylist } = usePlaylist();
+  const { playlists, deletePlaylist, renamePlaylist, removeSongFromPlaylist } = usePlaylist();
   const { playSong, isSongActive } = usePlayer();
   const { colors } = useTheme();
   const navigation = useNavigation();
@@ -84,14 +85,21 @@ export default function PlaylistDetailScreen() {
         </View>
       </View>
 
-      <FlatList data={playlist.songs} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 100 }}
+      <FlatList 
+        data={playlist.songs} 
+        keyExtractor={(item) => item.id} 
+        contentContainerStyle={{ paddingBottom: 100 }}
         renderItem={({ item, index }) => (
-          <SongItem 
-            song={item} 
-            index={index} 
-            isActive={isSongActive(item.id)}
-            onPress={() => playSong(item, playlist.songs)} 
-          />
+          <SwipeableItem 
+            onDelete={() => removeSongFromPlaylist(playlist.id, item.id)}
+          >
+            <SongItem 
+              song={item} 
+              index={index} 
+              isActive={isSongActive(item.id)}
+              onPress={() => playSong(item, playlist.songs)} 
+            />
+          </SwipeableItem>
         )}
         ListEmptyComponent={
           <View style={s.emptyState}>
