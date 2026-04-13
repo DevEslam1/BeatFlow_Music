@@ -111,6 +111,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
     if (playerRef.current) {
       try {
+        // Disable lock screen controls if the API is available
+        (playerRef.current as any).setActiveForLockScreen?.(false);
         playerRef.current.pause();
       } catch {
         // Ignore player cleanup errors during teardown.
@@ -158,6 +160,22 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       setQueueIndex(index);
       setPosition(0);
       setDuration(song.duration);
+
+      // Enable lock screen / notification controls with song metadata.
+      // On Android this is required for sustained background playback
+      // (without it the OS kills audio after ~3 minutes).
+      // Uses optional chaining since this API may not exist in older expo-audio versions.
+      try {
+        (player as any).setActiveForLockScreen?.(true, {
+          title: song.name,
+          artist: song.artist,
+          albumTitle: song.album,
+          artworkUrl: song.image,
+        });
+      } catch (e) {
+        console.warn('Could not set lock screen metadata:', e);
+      }
+
       player.play();
       setIsPlaying(true);
 
