@@ -134,13 +134,15 @@ export default function PlayerScreen() {
                 color={colors.onSurfaceVariant}
               />
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => toggleDownload(currentSong)}>
-              <Ionicons
-                name={downloaded ? "cloud-done" : "cloud-download-outline"}
-                size={28}
-                color={downloaded ? colors.primary : colors.onSurfaceVariant}
-              />
-            </TouchableOpacity>
+            {!currentSong.id.startsWith("local-") && (
+              <TouchableOpacity onPress={() => toggleDownload(currentSong)}>
+                <Ionicons
+                  name={downloaded ? "cloud-done" : "cloud-download-outline"}
+                  size={28}
+                  color={downloaded ? colors.primary : colors.onSurfaceVariant}
+                />
+              </TouchableOpacity>
+            )}
             <TouchableOpacity onPress={() => toggleFavorite(currentSong)}>
               <Ionicons
                 name={liked ? "heart" : "heart-outline"}
