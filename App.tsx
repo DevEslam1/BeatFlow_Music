@@ -24,6 +24,9 @@ import MiniPlayer from '@/components/MiniPlayer';
 import { navigationRef } from '@/navigation/RootNavigation';
 import { NavigationStateProvider, useNavigationStateContext } from '@/contexts/NavigationContext';
 import { NetworkStatusBanner } from '@/components/NetworkStatusBanner';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { Radii, Spacing } from '@/constants/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -88,6 +91,25 @@ function AppNavigator() {
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
+        <View style={{ alignItems: 'center', marginBottom: Spacing['4xl'] }}>
+          <LinearGradient
+            colors={[colors.primary, colors.primaryDim]}
+            style={{
+              width: 100,
+              height: 100,
+              borderRadius: Radii['2xl'],
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginBottom: Spacing.lg,
+            }}
+          >
+            <Ionicons
+              name="musical-notes"
+              size={50}
+              color={colors.onPrimaryFixed}
+            />
+          </LinearGradient>
+        </View>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );

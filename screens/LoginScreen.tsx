@@ -150,7 +150,7 @@ const makeStyles = (c: ColorPalette) =>
     logoGradient: {
       width: 80,
       height: 80,
-      borderRadius: Radii.xl,
+      borderRadius: Radii['2xl'],
       justifyContent: "center",
       alignItems: "center",
       marginBottom: Spacing.lg,
