@@ -7,11 +7,12 @@ import { usePlaylist } from '@/contexts/PlaylistContext';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import SongItem from '@/components/SongItem';
+import SwipeableItem from '@/components/SwipeableItem';
 
 type TabType = 'Online' | 'Local';
 
 export default function FavoritesScreen() {
-  const { favorites } = usePlaylist();
+  const { favorites, toggleFavorite } = usePlaylist();
   const { playSong, isSongActive } = usePlayer();
   const { colors } = useTheme();
   const navigation = useNavigation();
@@ -78,12 +79,14 @@ export default function FavoritesScreen() {
         keyExtractor={(item) => item.id} 
         contentContainerStyle={{ paddingBottom: 100 }}
         renderItem={({ item, index }) => (
-          <SongItem 
-            song={item} 
-            index={index} 
-            isActive={isSongActive(item.id)}
-            onPress={() => playSong(item, filteredFavorites)} 
-          />
+          <SwipeableItem onDelete={() => toggleFavorite(item)}>
+            <SongItem 
+              song={item} 
+              index={index} 
+              isActive={isSongActive(item.id)}
+              onPress={() => playSong(item, filteredFavorites)} 
+            />
+          </SwipeableItem>
         )}
         ListEmptyComponent={
           <View style={s.emptyState}>

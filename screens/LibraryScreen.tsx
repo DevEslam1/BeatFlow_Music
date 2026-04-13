@@ -15,6 +15,7 @@ import { useNetwork } from '@/contexts/NetworkContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { TabScreenNavProp } from '@/navigation/types';
 import SongItem from '@/components/SongItem';
+import SwipeableItem from '@/components/SwipeableItem';
 
 const TABS = ['Songs', 'Playlists', 'Favorites', 'Downloads'];
 
@@ -25,7 +26,10 @@ export default function LibraryScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'artist'>('name');
   const { playSong, isSongActive } = usePlayer();
-  const { playlists, favorites, downloads } = usePlaylist();
+  const { 
+    playlists, favorites, downloads, 
+    toggleFavorite, toggleDownload, deletePlaylist 
+  } = usePlaylist();
   const { isOffline } = useNetwork();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
@@ -115,14 +119,16 @@ export default function LibraryScreen() {
             </TouchableOpacity>
           }
           renderItem={({ item }) => (
-            <TouchableOpacity style={s.playlistItem} onPress={() => navigation.navigate('PlaylistDetail', { id: item.id })}>
-              <View style={s.playlistCover}><Ionicons name="musical-notes" size={24} color={colors.primary} /></View>
-              <View style={s.playlistInfo}>
-                <Text style={s.playlistName}>{item.name}</Text>
-                <Text style={s.playlistCount}>{item.songs.length} songs</Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={colors.onSurfaceVariant} />
-            </TouchableOpacity>
+            <SwipeableItem onDelete={() => deletePlaylist(item.id)}>
+              <TouchableOpacity style={s.playlistItem} onPress={() => navigation.navigate('PlaylistDetail', { id: item.id })}>
+                <View style={s.playlistCover}><Ionicons name="musical-notes" size={24} color={colors.primary} /></View>
+                <View style={s.playlistInfo}>
+                  <Text style={s.playlistName}>{item.name}</Text>
+                  <Text style={s.playlistCount}>{item.songs.length} songs</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={colors.onSurfaceVariant} />
+              </TouchableOpacity>
+            </SwipeableItem>
           )}
           ListEmptyComponent={<Text style={s.emptyText}>No playlists yet. Create one!</Text>}
         />
@@ -142,12 +148,14 @@ export default function LibraryScreen() {
             </View>
           ) : null}
           renderItem={({ item, index }) => (
-            <SongItem 
-              song={item} 
-              index={index} 
-              isActive={isSongActive(item.id)}
-              onPress={() => playSong(item, favorites)} 
-            />
+            <SwipeableItem onDelete={() => toggleFavorite(item)}>
+              <SongItem 
+                song={item} 
+                index={index} 
+                isActive={isSongActive(item.id)}
+                onPress={() => playSong(item, favorites)} 
+              />
+            </SwipeableItem>
           )}
           ListEmptyComponent={<Text style={s.emptyText}>No favorites yet. Like some songs!</Text>}
         />
@@ -167,12 +175,14 @@ export default function LibraryScreen() {
             </View>
           ) : null}
           renderItem={({ item, index }) => (
-            <SongItem 
-              song={item} 
-              index={index} 
-              isActive={isSongActive(item.id)}
-              onPress={() => playSong(item, downloads)} 
-            />
+            <SwipeableItem onDelete={() => toggleDownload(item)}>
+              <SongItem 
+                song={item} 
+                index={index} 
+                isActive={isSongActive(item.id)}
+                onPress={() => playSong(item, downloads)} 
+              />
+            </SwipeableItem>
           )}
           ListEmptyComponent={<Text style={s.emptyText}>No downloads yet. Save some songs for offline listening!</Text>}
         />
