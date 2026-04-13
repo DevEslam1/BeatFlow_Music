@@ -1,7 +1,7 @@
 # BeatFlow
 
 <p align="center">
-  <img src="./assets/images/app_icon.jpg" width="150" alt="BeatFlow app icon" style="border-radius: 30px; margin-bottom: 20px;" />
+  <img src="./assets/images/adaptive_icon.png" width="150" alt="BeatFlow app icon" style="border-radius: 30px; margin-bottom: 20px;" />
 </p>
 
 BeatFlow is a React Native music player built with Expo. It combines Deezer preview streaming, offline downloads, local audio scanning, playlist management, and a polished mobile UI in one portfolio app.
@@ -43,18 +43,18 @@ The goal of this project is to show practical mobile engineering skills:
 
 ## Tech Stack
 
-| Area | Choice |
-| --- | --- |
-| Framework | React Native 0.81 |
-| Runtime | Expo SDK 54 |
-| Language | TypeScript |
-| Navigation | React Navigation 7 |
-| Audio | `expo-audio` |
-| Media Access | `expo-media-library` |
-| Persistence | `@react-native-async-storage/async-storage`, `expo-file-system` |
-| Network Awareness | `@react-native-community/netinfo` |
-| UI | `expo-image`, `expo-linear-gradient`, `expo-blur`, `expo-haptics` |
-| State Management | React Context |
+| Area              | Choice                                                            |
+| ----------------- | ----------------------------------------------------------------- |
+| Framework         | React Native 0.81                                                 |
+| Runtime           | Expo SDK 54                                                       |
+| Language          | TypeScript                                                        |
+| Navigation        | React Navigation 7                                                |
+| Audio             | `expo-audio`                                                      |
+| Media Access      | `expo-media-library`                                              |
+| Persistence       | `@react-native-async-storage/async-storage`, `expo-file-system`   |
+| Network Awareness | `@react-native-community/netinfo`                                 |
+| UI                | `expo-image`, `expo-linear-gradient`, `expo-blur`, `expo-haptics` |
+| State Management  | React Context                                                     |
 
 ## Architecture Summary
 
@@ -114,7 +114,8 @@ npm install
 ```
 
 ### Build & Run
-*Note: Because this app uses native background services and custom permissions, it requires a Development Build or local compilation (not standard Expo Go).*
+
+_Note: Because this app uses native background services and custom permissions, it requires a Development Build or local compilation (not standard Expo Go)._
 
 ```bash
 # Prebuild native directories
