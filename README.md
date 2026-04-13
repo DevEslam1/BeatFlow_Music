@@ -35,6 +35,8 @@ The goal of this project is to show practical mobile engineering skills:
 - **System Media Controls**: Support for lock screen and notification drawer controls (Now Playing metadata).
 - **Persistent Mini Player**: Seamless music control while navigating the entire app.
 - **Library Management**: Supports favorites, custom playlists, recently played tracks, and downloads.
+- **Swipe Interactions**: Quick swipe-to-remove management for Favorites, Downloads, and Playlists with integrated haptic feedback.
+- **Network Resilience**: Global connectivity monitoring with automatic 3s polling and a localized status banner for seamless UX during outages.
 - **Offline Mode**: Detects connectivity and automatically switches to playing downloaded local content.
 - **Local Media Scanning**: Scans device audio files to merge local and online libraries in one player experience.
 - **Theming**: Fully theme-aware UI (Light, Dark, and System modes).
@@ -77,7 +79,7 @@ This structure keeps UI, business logic, and shared state separated well enough 
 
 ### Offline And Local Media
 
-- **Intelligent Connectivity**: Offline mode detection using NetInfo with automatic fallback to local assets.
+- **Network Resilience**: Real-time monitoring with `NetInfo`. Implements a 3s polling strategy to force connectivity refreshes when offline, paired with a global `NetworkStatusBanner` for immediate user feedback.
 - **Persistent Storage**: Downloaded audio management using `expo-file-system` and metadata persistence with Async Storage.
 - **Media Mapping**: Device media scanning and classification to integrate local tracks into the player's unified data model.
 

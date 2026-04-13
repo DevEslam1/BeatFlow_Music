@@ -9,7 +9,9 @@ function mapTrackToSong(track: DeezerTrack): Song {
     artist: track.artist?.name ?? 'Unknown Artist',
     album: track.album?.title ?? 'Unknown Album',
     image: track.album?.cover_big || track.album?.cover_medium || '',
-    duration: track.duration * 1000,
+    // Deezer API returns full track duration, but we only have 30s previews.
+    // Setting this to 30s ensures the UI matches actual playback capability.
+    duration: 30000, 
     uri: track.link,
     previewUrl: track.preview,
   };
