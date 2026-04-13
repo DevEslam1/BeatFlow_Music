@@ -1,7 +1,7 @@
 # BeatFlow
 
 <p align="center">
-  <img src="./assets/images/adaptive_icon.png" width="120" alt="BeatFlow app icon" />
+  <img src="./assets/images/app_icon.jpg" width="150" alt="BeatFlow app icon" style="border-radius: 30px; margin-bottom: 20px;" />
 </p>
 
 BeatFlow is a React Native music player built with Expo. It combines Deezer preview streaming, offline downloads, local audio scanning, playlist management, and a polished mobile UI in one portfolio app.
