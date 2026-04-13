@@ -23,6 +23,7 @@ import CreatePlaylistScreen from '@/screens/CreatePlaylistScreen';
 import MiniPlayer from '@/components/MiniPlayer';
 import { navigationRef } from '@/navigation/RootNavigation';
 import { NavigationStateProvider, useNavigationStateContext } from '@/contexts/NavigationContext';
+import { NetworkStatusBanner } from '@/components/NetworkStatusBanner';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -124,6 +125,7 @@ function AppNavigator() {
         <View style={{ flex: 1 }}>
           {user ? <MainNavigator /> : <AuthNavigator />}
           {user && <MiniPlayer />}
+          <NetworkStatusBanner />
         </View>
       </NavigationContainer>
     </>
