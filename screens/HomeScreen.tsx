@@ -48,7 +48,7 @@ const SUGGESTED_PLAYLISTS: SuggestedPlaylist[] = [
 export default function HomeScreen() {
   const { user } = useAuth();
   const { recentlyPlayed, playSong, isSongActive } = usePlayer();
-  const { favorites } = usePlaylist();
+  const { favorites, isDownloaded } = usePlaylist();
   const { isOffline, isConnected, isOfflineModeEnabled, toggleOfflineMode } = useNetwork();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
@@ -57,6 +57,12 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [playlistSongs, setPlaylistSongs] = useState<Record<string, Song[]>>({});
   const [loadingPlaylist, setLoadingPlaylist] = useState<string | null>(null);
+  
+  const displayedFavorites = useMemo(() => {
+    if (!isOffline) return favorites.slice(0, 8);
+    return favorites.filter(s => isDownloaded(s.id)).slice(0, 8);
+  }, [isOffline, favorites, isDownloaded]);
+
   const s = useMemo(() => makeStyles(colors), [colors]);
 
   useEffect(() => {
@@ -128,25 +134,19 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      {isOffline && (
-        <View style={s.offlineBanner}>
-          <Ionicons name="cloud-offline" size={48} color={colors.onSurfaceVariant} />
-          <Text style={s.offlineTitle}>
-            {isConnected ? 'Offline Mode Enabled' : "You're Offline"}
-          </Text>
-          <Text style={s.offlineDesc}>
-            {isConnected
-              ? 'Streaming is paused. Use Local Library or Downloads until you switch back online.'
-              : 'Go to Library > Downloads to play saved music.'}
-          </Text>
-        </View>
-      )}
 
-      {!isOffline && (
-        <View style={s.section}>
-          <View style={s.sectionHeader}>
-            <Text style={s.sectionTitle}>Made For You</Text>
+      <View style={s.section}>
+        <View style={s.sectionHeader}>
+          <Text style={s.sectionTitle}>Made For You</Text>
+        </View>
+        {isOffline ? (
+          <View style={{ padding: Spacing.xl, alignItems: 'center' }}>
+            <Ionicons name="cloud-offline" size={32} color={colors.onSurfaceVariant} />
+            <Text style={{ color: colors.onSurfaceVariant, marginTop: Spacing.sm, textAlign: 'center' }}>
+              Suggestions require an internet connection.
+            </Text>
           </View>
+        ) : (
           <FlatList
             horizontal
             data={SUGGESTED_PLAYLISTS}
@@ -185,8 +185,8 @@ export default function HomeScreen() {
               </TouchableOpacity>
             )}
           />
-        </View>
-      )}
+        )}
+      </View>
 
       {recentlyPlayed.length > 0 && (
         <View style={s.section}>
@@ -202,75 +202,94 @@ export default function HomeScreen() {
             keyExtractor={(item) => item.id}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: Spacing.lg }}
-            renderItem={({ item }) => (
-              <TouchableOpacity style={s.recentItem} onPress={() => playSong(item, recentlyPlayed)}>
-                <Image source={{ uri: item.image }} style={s.recentImage} />
-                <Text style={s.recentTitle} numberOfLines={1}>
-                  {item.name}
-                </Text>
-                <Text style={s.recentArtist} numberOfLines={1}>
-                  {item.artist}
-                </Text>
-              </TouchableOpacity>
-            )}
+            renderItem={({ item }) => {
+              const available = !isOffline || isDownloaded(item.id);
+              return (
+                <TouchableOpacity 
+                  style={[s.recentItem, !available && { opacity: 0.38 }]} 
+                  onPress={() => available && playSong(item, recentlyPlayed)}
+                  disabled={!available}
+                >
+                  <Image source={{ uri: item.image }} style={s.recentImage} />
+                  <Text style={s.recentTitle} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  <Text style={s.recentArtist} numberOfLines={1}>
+                    {item.artist}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
           />
         </View>
       )}
 
-      {favorites.length > 0 && (
+      {displayedFavorites.length > 0 && (
         <View style={s.section}>
           <View style={s.sectionHeader}>
             <Text style={s.sectionTitle}>Your Favorites</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Favorites')}>
+            <TouchableOpacity onPress={() => navigation.navigate('Library', { screen: 'Favorites' })}>
               <Text style={s.seeAll}>See All</Text>
             </TouchableOpacity>
           </View>
           <FlatList
             horizontal
-            data={favorites.slice(0, 8)}
+            data={displayedFavorites}
             keyExtractor={(item) => item.id}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ paddingHorizontal: Spacing.lg }}
-            renderItem={({ item }) => (
-              <TouchableOpacity style={s.favItem} onPress={() => playSong(item, favorites)}>
-                <View>
-                  <Image source={{ uri: item.image }} style={s.favImage} />
-                  <View style={s.favHeart}>
-                    <Ionicons name="heart" size={14} color={colors.primary} />
+            renderItem={({ item }) => {
+              const available = !isOffline || isDownloaded(item.id);
+              return (
+                <TouchableOpacity 
+                  style={[s.favItem, !available && { opacity: 0.38 }]} 
+                  onPress={() => available && playSong(item, favorites)}
+                  disabled={!available}
+                >
+                  <View>
+                    <Image source={{ uri: item.image }} style={s.favImage} />
+                    <View style={s.favHeart}>
+                      <Ionicons name="heart" size={14} color={colors.primary} />
+                    </View>
                   </View>
-                </View>
-                <Text style={s.recentTitle} numberOfLines={1}>
-                  {item.name}
-                </Text>
-                <Text style={s.recentArtist} numberOfLines={1}>
-                  {item.artist}
-                </Text>
-              </TouchableOpacity>
-            )}
+                  <Text style={s.recentTitle} numberOfLines={1}>
+                    {item.name}
+                  </Text>
+                  <Text style={s.recentArtist} numberOfLines={1}>
+                    {item.artist}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
           />
         </View>
       )}
 
-      {!isOffline && (
-        <View style={s.section}>
-          <View style={s.sectionHeader}>
-            <Text style={s.sectionTitle}>Trending Now</Text>
-          </View>
-          {loading ? (
-            <ActivityIndicator color={colors.primary} style={{ marginTop: Spacing.xl }} />
-          ) : (
-            trending.slice(0, 15).map((song, index) => (
-              <SongItem
-                key={song.id}
-                song={song}
-                index={index}
-                isActive={isSongActive(song.id)}
-                onPress={() => playSong(song, trending)}
-              />
-            ))
-          )}
+      <View style={s.section}>
+        <View style={s.sectionHeader}>
+          <Text style={s.sectionTitle}>Trending Now</Text>
         </View>
-      )}
+        {isOffline ? (
+          <View style={{ padding: Spacing.xl, alignItems: 'center' }}>
+            <Ionicons name="cloud-offline" size={32} color={colors.onSurfaceVariant} />
+            <Text style={{ color: colors.onSurfaceVariant, marginTop: Spacing.sm, textAlign: 'center' }}>
+              Trending charts are unavailable offline.
+            </Text>
+          </View>
+        ) : loading ? (
+          <ActivityIndicator color={colors.primary} style={{ marginTop: Spacing.xl }} />
+        ) : (
+          trending.slice(0, 15).map((song, index) => (
+            <SongItem
+              key={song.id}
+              song={song}
+              index={index}
+              isActive={isSongActive(song.id)}
+              onPress={() => playSong(song, trending)}
+            />
+          ))
+        )}
+      </View>
 
       <View style={{ height: 140 }} />
     </ScrollView>

@@ -10,12 +10,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlaylist } from '@/contexts/PlaylistContext';
 import { useTheme, ThemeMode } from '@/contexts/ThemeContext';
+import { useNetwork } from '@/contexts/NetworkContext';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
   const { favorites, playlists } = usePlaylist();
   const { recentlyPlayed } = usePlayer();
   const { colors, mode, setMode } = useTheme();
+  const { isOffline, isConnected, isOfflineModeEnabled, toggleOfflineMode } = useNetwork();
   const navigation = useNavigation<TabScreenNavProp>();
   const insets = useSafeAreaInsets();
   const s = useMemo(() => makeStyles(colors), [colors]);
@@ -50,12 +52,28 @@ export default function ProfileScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={s.header}>
-        <TouchableOpacity style={s.menuButton} onPress={() => navigation.openDrawer()}>
-          <Ionicons name="menu" size={28} color={colors.onSurface} />
+        <TouchableOpacity style={s.headerButton} onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={26} color={colors.onSurface} />
         </TouchableOpacity>
-        <TouchableOpacity style={s.settingsButton} onPress={() => navigation.navigate('Settings')}>
-          <Ionicons name="settings-outline" size={22} color={colors.onSurface} />
-        </TouchableOpacity>
+        <View style={{ flex: 1 }} />
+        <View style={s.headerActions}>
+          <TouchableOpacity
+            style={[
+              s.headerButton,
+              (isOfflineModeEnabled || !isConnected) && { backgroundColor: colors.secondaryContainer },
+            ]}
+            onPress={toggleOfflineMode}
+          >
+            <Ionicons
+              name={isOfflineModeEnabled || !isConnected ? 'cloud-offline' : 'cloud-outline'}
+              size={24}
+              color={isOfflineModeEnabled || !isConnected ? colors.secondary : colors.onSurface}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={s.headerButton} onPress={() => navigation.navigate('Settings')}>
+            <Ionicons name="settings-outline" size={22} color={colors.onSurface} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={s.hero}>
@@ -257,7 +275,7 @@ const makeStyles = (c: ColorPalette) =>
       paddingHorizontal: Spacing.xl,
       marginBottom: Spacing.md,
     },
-    menuButton: {
+    headerButton: {
       width: 44,
       height: 44,
       borderRadius: Radii.full,
@@ -265,13 +283,10 @@ const makeStyles = (c: ColorPalette) =>
       justifyContent: 'center',
       alignItems: 'center',
     },
-    settingsButton: {
-      width: 44,
-      height: 44,
-      borderRadius: Radii.full,
-      backgroundColor: c.surfaceContainer,
-      justifyContent: 'center',
+    headerActions: {
+      flexDirection: 'row',
       alignItems: 'center',
+      gap: Spacing.sm,
     },
     hero: {
       alignItems: 'center',

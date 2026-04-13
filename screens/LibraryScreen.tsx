@@ -30,17 +30,36 @@ export default function LibraryScreen() {
     playlists, favorites, downloads, 
     toggleFavorite, toggleDownload, deletePlaylist 
   } = usePlaylist();
-  const { isOffline } = useNetwork();
-  const insets = useSafeAreaInsets();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<TabScreenNavProp>();
+  const { isOffline, isConnected, isOfflineModeEnabled, toggleOfflineMode } = useNetwork();
   const s = useMemo(() => makeStyles(colors), [colors]);
 
+  const hasDownloadedFavorites = useMemo(() => 
+    favorites.some(s => downloads.some(d => d.id === s.id)), 
+    [favorites, downloads]
+  );
+  const hasDownloadedPlaylists = useMemo(() => 
+    playlists.some(p => p.songs.some(s => downloads.some(d => d.id === s.id))), 
+    [playlists, downloads]
+  );
+
+  const availableTabs = useMemo(() => {
+    if (!isOffline) return TABS;
+    return TABS.filter(tab => {
+      if (tab === 'Songs') return false;
+      if (tab === 'Playlists') return hasDownloadedPlaylists;
+      if (tab === 'Favorites') return hasDownloadedFavorites;
+      return true; // Always show Downloads when offline
+    });
+  }, [isOffline, hasDownloadedFavorites, hasDownloadedPlaylists]);
+
   useEffect(() => {
-    if (isOffline && activeTab === 'Songs') {
+    if (isOffline && !availableTabs.includes(activeTab)) {
       setActiveTab('Downloads');
     }
-  }, [isOffline, activeTab]);
+  }, [isOffline, activeTab, availableTabs]);
 
   useEffect(() => { loadSongs(); }, []);
 
@@ -62,11 +81,26 @@ export default function LibraryScreen() {
 
   return (
     <View style={[s.container, { paddingTop: insets.top + Spacing.sm }]}>
-      <View style={s.titleContainer}>
-        <TouchableOpacity style={s.menuButton} onPress={() => navigation.openDrawer()}>
-          <Ionicons name="menu" size={28} color={colors.onSurface} />
+      <View style={s.header}>
+        <TouchableOpacity style={s.headerButton} onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={26} color={colors.onSurface} />
         </TouchableOpacity>
         <Text style={s.title}>My Library</Text>
+        <View style={s.headerActions}>
+          <TouchableOpacity
+            style={[
+              s.offlineButton,
+              (isOfflineModeEnabled || !isConnected) && { backgroundColor: colors.secondaryContainer },
+            ]}
+            onPress={toggleOfflineMode}
+          >
+            <Ionicons
+              name={isOfflineModeEnabled || !isConnected ? 'cloud-offline' : 'cloud-outline'}
+              size={24}
+              color={isOfflineModeEnabled || !isConnected ? colors.secondary : colors.onSurface}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={s.searchBar}>
@@ -76,9 +110,12 @@ export default function LibraryScreen() {
       </View>
 
       <View style={s.tabRow}>
-        {TABS.filter(tab => !(isOffline && tab === 'Songs')).map((tab) => (
-          <TouchableOpacity key={tab} style={[s.tab, activeTab === tab && s.activeTab]} onPress={() => setActiveTab(tab)}>
+        {availableTabs.map((tab) => (
+          <TouchableOpacity key={tab} style={[s.tab, activeTab === tab && s.activeTab, { flexDirection: 'row', alignItems: 'center', gap: 4 }]} onPress={() => setActiveTab(tab)}>
             <Text style={[s.tabText, activeTab === tab && s.activeTabText]}>{tab}</Text>
+            {isOffline && tab !== 'Downloads' && (
+              <Ionicons name="cloud-offline" size={14} color={activeTab === tab ? colors.onPrimaryFixed : colors.secondary} />
+            )}
           </TouchableOpacity>
         ))}
       </View>
@@ -110,7 +147,7 @@ export default function LibraryScreen() {
       )}
 
       {activeTab === 'Playlists' && (
-        <FlatList data={playlists} keyExtractor={(item) => item.id}
+        <FlatList data={isOffline ? playlists.filter(p => p.songs.some(s => downloads.some(d => d.id === s.id))) : playlists} keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: Spacing.xl, paddingBottom: 180 }}
           ListHeaderComponent={
             <TouchableOpacity style={s.createPlaylistButton} onPress={() => navigation.navigate('CreatePlaylist')}>
@@ -135,7 +172,7 @@ export default function LibraryScreen() {
       )}
 
       {activeTab === 'Favorites' && (
-        <FlatList data={favorites} keyExtractor={(item) => item.id}
+        <FlatList data={isOffline ? favorites.filter(s => downloads.some(d => d.id === s.id)) : favorites} keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingBottom: 180 }}
           ListHeaderComponent={favorites.length > 0 ? (
             <View style={s.favHeader}>
@@ -192,10 +229,40 @@ export default function LibraryScreen() {
 }
 
 const makeStyles = (c: ColorPalette) => StyleSheet.create({
-  container: { flex: 1, backgroundColor: c.background },
-  titleContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing.xl, marginBottom: Spacing.md, gap: Spacing.md },
-  menuButton: { width: 44, height: 44, borderRadius: Radii.full, backgroundColor: c.surfaceContainer, justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: FontSizes.headlineLg, fontWeight: '700', color: c.onSurface },
+  header: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingHorizontal: Spacing.xl, 
+    marginBottom: Spacing.md, 
+    gap: Spacing.md 
+  },
+  headerButton: { 
+    width: 44, 
+    height: 44, 
+    borderRadius: Radii.full, 
+    backgroundColor: c.surfaceContainer, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  offlineButton: {
+    width: 44,
+    height: 44,
+    borderRadius: Radii.full,
+    backgroundColor: c.surfaceContainer,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: { 
+    flex: 1,
+    fontSize: FontSizes.headlineLg, 
+    fontWeight: '700', 
+    color: c.onSurface 
+  },
   searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: c.surfaceContainer, marginHorizontal: Spacing.xl, borderRadius: Radii.md, paddingHorizontal: Spacing.lg, height: 44, gap: Spacing.sm, marginBottom: Spacing.md },
   searchInput: { flex: 1, color: c.onSurface, fontSize: FontSizes.bodyMd },
   tabRow: { flexDirection: 'row', paddingHorizontal: Spacing.xl, gap: Spacing.xs, marginBottom: Spacing.md },

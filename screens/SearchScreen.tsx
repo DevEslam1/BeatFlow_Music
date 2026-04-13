@@ -51,7 +51,7 @@ export default function SearchScreen() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [hasSearched, setHasSearched] = useState(false);
   const { playSong, isSongActive } = usePlayer();
-  const { isOffline } = useNetwork();
+  const { isOffline, isConnected, isOfflineModeEnabled, toggleOfflineMode } = useNetwork();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const navigation = useNavigation<TabScreenNavProp>();
@@ -77,11 +77,26 @@ export default function SearchScreen() {
 
   return (
     <View style={[s.container, { paddingTop: insets.top + Spacing.sm }]}>
-      <View style={s.titleContainer}>
-        <TouchableOpacity style={s.menuButton} onPress={() => navigation.openDrawer()}>
-          <Ionicons name="menu" size={28} color={colors.onSurface} />
+      <View style={s.header}>
+        <TouchableOpacity style={s.headerButton} onPress={() => navigation.openDrawer()}>
+          <Ionicons name="menu" size={26} color={colors.onSurface} />
         </TouchableOpacity>
         <Text style={s.title}>Search</Text>
+        <View style={s.headerActions}>
+          <TouchableOpacity
+            style={[
+              s.offlineButton,
+              (isOfflineModeEnabled || !isConnected) && { backgroundColor: colors.secondaryContainer },
+            ]}
+            onPress={toggleOfflineMode}
+          >
+            <Ionicons
+              name={isOfflineModeEnabled || !isConnected ? 'cloud-offline' : 'cloud-outline'}
+              size={24}
+              color={isOfflineModeEnabled || !isConnected ? colors.secondary : colors.onSurface}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={s.searchBar}>
@@ -214,14 +229,14 @@ export default function SearchScreen() {
 const makeStyles = (c: ColorPalette) =>
   StyleSheet.create({
     container: { flex: 1, backgroundColor: c.background },
-    titleContainer: {
+    header: {
       flexDirection: 'row',
       alignItems: 'center',
       paddingHorizontal: Spacing.xl,
       marginBottom: Spacing.lg,
       gap: Spacing.md,
     },
-    menuButton: { 
+    headerButton: { 
       width: 44, 
       height: 44, 
       borderRadius: Radii.full, 
@@ -229,7 +244,21 @@ const makeStyles = (c: ColorPalette) =>
       justifyContent: "center", 
       alignItems: "center" 
     },
+    headerActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.sm,
+    },
+    offlineButton: {
+      width: 44,
+      height: 44,
+      borderRadius: Radii.full,
+      backgroundColor: c.surfaceContainer,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
     title: {
+      flex: 1,
       fontSize: FontSizes.headlineLg,
       fontWeight: "700",
       color: c.onSurface,

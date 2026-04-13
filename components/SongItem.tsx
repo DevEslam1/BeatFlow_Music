@@ -9,6 +9,7 @@ import { formatDuration } from '@/services/api';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlaylist } from '@/contexts/PlaylistContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useNetwork } from '@/contexts/NetworkContext';
 
 interface SongItemProps {
   song: Song;
@@ -26,10 +27,16 @@ export default function SongItem({
   isActive = false,
 }: SongItemProps) {
   const { isPlaying: playerIsPlaying } = usePlayer();
-  const { isFavorite, toggleFavorite } = usePlaylist();
+  const { isFavorite, toggleFavorite, isDownloaded } = usePlaylist();
   const { colors } = useTheme();
+  const { isOffline } = useNetwork();
+  
   const liked = isFavorite(song.id);
+  const downloaded = isDownloaded(song.id);
   const isPlaying = isActive && playerIsPlaying;
+  
+  const isDisabled = isOffline && !downloaded;
+  
   const styles = useMemo(() => makeStyles(colors), [colors]);
 
   return (
@@ -37,8 +44,13 @@ export default function SongItem({
       entering={FadeInRight.delay((index ?? 0) * 50).duration(400)}
     >
       <TouchableOpacity
-        style={[styles.container, isActive && styles.activeContainer]}
+        style={[
+          styles.container, 
+          isActive && styles.activeContainer,
+          isDisabled && { opacity: 0.38 }
+        ]}
         onPress={onPress}
+        disabled={isDisabled}
         activeOpacity={0.7}
       >
         {index !== undefined && (

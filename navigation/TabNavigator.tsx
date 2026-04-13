@@ -10,11 +10,13 @@ import SearchScreen from '@/screens/SearchScreen';
 import LibraryScreen from '@/screens/LibraryScreen';
 import ProfileScreen from '@/screens/ProfileScreen';
 import MiniPlayer from '@/components/MiniPlayer';
+import { useNetwork } from '@/contexts/NetworkContext';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
 export default function TabNavigator() {
   const { colors } = useTheme();
+  const { isOffline } = useNetwork();
   const insets = useSafeAreaInsets();
 
   const TAB_BAR_HEIGHT = 60 + insets.bottom;
@@ -44,8 +46,23 @@ export default function TabNavigator() {
           component={HomeScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home" size={size} color={color} />
+              <View style={{ width: size, height: size }}>
+                <Ionicons 
+                  name="home" 
+                  size={size} 
+                  color={color} 
+                />
+                {isOffline && (
+                  <View style={{ position: 'absolute', top: -4, right: -4, backgroundColor: colors.background, borderRadius: 10, padding: 1 }}>
+                    <Ionicons name="cloud-offline" size={12} color={colors.secondary} />
+                  </View>
+                )}
+              </View>
             ),
+            tabBarLabelStyle: {
+              fontSize: 11,
+              fontWeight: '500',
+            },
           }}
         />
         <Tab.Screen
@@ -53,7 +70,14 @@ export default function TabNavigator() {
           component={SearchScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="search" size={size} color={color} />
+              <View style={{ width: size, height: size }}>
+                <Ionicons name="search" size={size} color={color} />
+                {isOffline && (
+                  <View style={{ position: 'absolute', top: -4, right: -4, backgroundColor: colors.background, borderRadius: 10, padding: 1 }}>
+                    <Ionicons name="cloud-offline" size={12} color={colors.secondary} />
+                  </View>
+                )}
+              </View>
             ),
           }}
         />
@@ -62,7 +86,14 @@ export default function TabNavigator() {
           component={LibraryScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="library" size={size} color={color} />
+              <View style={{ width: size, height: size }}>
+                <Ionicons name="library" size={size} color={color} />
+                {isOffline && (
+                  <View style={{ position: 'absolute', top: -4, right: -4, backgroundColor: colors.background, borderRadius: 10, padding: 1 }}>
+                    <Ionicons name="cloud-offline" size={12} color={colors.secondary} />
+                  </View>
+                )}
+              </View>
             ),
           }}
         />
@@ -71,7 +102,14 @@ export default function TabNavigator() {
           component={ProfileScreen}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="person" size={size} color={color} />
+              <View style={{ width: size, height: size }}>
+                <Ionicons name="person" size={size} color={color} />
+                {isOffline && (
+                  <View style={{ position: 'absolute', top: -4, right: -4, backgroundColor: colors.background, borderRadius: 10, padding: 1 }}>
+                    <Ionicons name="cloud-offline" size={12} color={colors.secondary} />
+                  </View>
+                )}
+              </View>
             ),
           }}
         />

@@ -9,6 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLocalTracks } from '@/contexts/LocalTracksContext';
 import { usePlayer } from '@/contexts/PlayerContext';
+import { useNetwork } from '@/contexts/NetworkContext';
 import { Spacing, Radii, FontSizes, ColorPalette } from '@/constants/theme';
 import SongItem from '@/components/SongItem';
 import { Song } from '@/services/types';
@@ -21,6 +22,7 @@ export default function LocalTracksScreen() {
   const [selectedGroupSongs, setSelectedGroupSongs] = useState<Song[] | null>(null);
   const { localSongs, albums, artists, folders, isLoading, permissionStatus, refreshLocalTracks } = useLocalTracks();
   const { playSong, isSongActive } = usePlayer();
+  const { isOffline, isConnected, isOfflineModeEnabled, toggleOfflineMode } = useNetwork();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const navigation = useNavigation<any>();
@@ -47,10 +49,13 @@ export default function LocalTracksScreen() {
         {(['Songs', 'Artists', 'Albums', 'Folders'] as TabType[]).map((tab) => (
           <TouchableOpacity 
             key={tab} 
-            style={[s.tab, activeTab === tab && s.activeTab]} 
+            style={[s.tab, activeTab === tab && s.activeTab, { flexDirection: 'row', alignItems: 'center', gap: 4 }]} 
             onPress={() => setActiveTab(tab)}
           >
             <Text style={[s.tabText, activeTab === tab && s.activeTabText]}>{tab}</Text>
+            {isOffline && (
+              <Ionicons name="cloud-offline" size={14} color={activeTab === tab ? colors.onPrimaryFixed : colors.secondary} />
+            )}
           </TouchableOpacity>
         ))}
       </View>
@@ -133,15 +138,32 @@ export default function LocalTracksScreen() {
   return (
     <View style={[s.container, { paddingTop: insets.top }]}>
       <View style={s.header}>
-        <TouchableOpacity onPress={handleBack} style={s.backButton}>
-          <Ionicons name={selectedGroupName ? "arrow-back" : "menu"} size={24} color={colors.onSurface} />
+        <TouchableOpacity onPress={handleBack} style={s.headerButton}>
+          <Ionicons name={selectedGroupName ? "arrow-back" : "menu"} size={26} color={colors.onSurface} />
         </TouchableOpacity>
+        
         <Text style={[s.title, { color: colors.onSurface }]}>
           {selectedGroupName ? activeTab.slice(0, -1) : 'Local Library'}
         </Text>
-        <TouchableOpacity onPress={refreshLocalTracks} style={s.backButton}>
-          <Ionicons name={selectedGroupName ? "shuffle" : "sync"} size={20} color={colors.primary} />
-        </TouchableOpacity>
+
+        <View style={s.headerActions}>
+          <TouchableOpacity onPress={refreshLocalTracks} style={s.headerButton}>
+            <Ionicons name={selectedGroupName ? "shuffle" : "sync"} size={22} color={colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              s.headerButton,
+              (isOfflineModeEnabled || !isConnected) && { backgroundColor: colors.secondaryContainer },
+            ]}
+            onPress={toggleOfflineMode}
+          >
+            <Ionicons
+              name={isOfflineModeEnabled || !isConnected ? 'cloud-offline' : 'cloud-outline'}
+              size={24}
+              color={isOfflineModeEnabled || !isConnected ? colors.secondary : colors.onSurface}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {renderTabHeader()}
@@ -189,12 +211,28 @@ const makeStyles = (c: ColorPalette) => StyleSheet.create({
   header: { 
     flexDirection: 'row', 
     alignItems: 'center', 
-    justifyContent: 'space-between',
     paddingHorizontal: Spacing.xl, 
-    paddingVertical: Spacing.md 
+    paddingVertical: Spacing.md,
+    gap: Spacing.md,
   },
-  title: { fontSize: FontSizes.headlineSm, fontWeight: 'bold' },
-  backButton: { padding: Spacing.xs },
+  title: { 
+    flex: 1,
+    fontSize: FontSizes.headlineSm, 
+    fontWeight: 'bold' 
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  headerButton: {
+    width: 44,
+    height: 44,
+    borderRadius: Radii.full,
+    backgroundColor: c.surfaceContainer,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   tabRow: { 
     flexDirection: 'row', 
     paddingHorizontal: Spacing.xl, 

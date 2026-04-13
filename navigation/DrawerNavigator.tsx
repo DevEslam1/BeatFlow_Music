@@ -4,6 +4,7 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItem, DrawerConte
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNetwork } from '@/contexts/NetworkContext';
 import { DrawerParamList } from './types';
 import TabNavigator from './TabNavigator';
 import LocalTracksScreen from '@/screens/LocalTracksScreen';
@@ -16,6 +17,7 @@ const Drawer = createDrawerNavigator<DrawerParamList>();
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const { colors } = useTheme();
   const { user, logout } = useAuth();
+  const { isOffline, isOfflineModeEnabled, isConnected, toggleOfflineMode } = useNetwork();
   const activeDrawerRoute = props.state.routes[props.state.index]?.name;
   const parentState = props.navigation.getParent()?.getState();
   const activeRootRoute = parentState?.routes[parentState.index ?? 0]?.name;
@@ -74,6 +76,21 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
           activeBackgroundColor={colors.surfaceContainerHigh}
           style={styles.customDrawerItem}
           labelStyle={styles.customDrawerLabel}
+        />
+        <DrawerItem
+          label={isOfflineModeEnabled || !isConnected ? "Offline Mode: ON" : "Offline Mode: OFF"}
+          onPress={toggleOfflineMode}
+          icon={({ color, size }) => (
+            <Ionicons 
+              name={isOfflineModeEnabled || !isConnected ? 'cloud-offline' : 'cloud-outline'} 
+              size={size} 
+              color={isOfflineModeEnabled || !isConnected ? colors.secondary : colors.onSurfaceVariant} 
+            />
+          )}
+          activeTintColor={colors.secondary}
+          inactiveTintColor={colors.onSurfaceVariant}
+          style={styles.customDrawerItem}
+          labelStyle={[styles.customDrawerLabel, (isOfflineModeEnabled || !isConnected) && { color: colors.secondary }]}
         />
         <DrawerItem
           label="Settings"
