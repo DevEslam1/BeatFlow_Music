@@ -1,3 +1,4 @@
+import AddToPlaylistModal from "@/components/AddToPlaylistModal";
 import { ColorPalette, FontSizes, Radii, Spacing } from "@/constants/theme";
 import { usePlayer } from "@/contexts/PlayerContext";
 import { usePlaylist } from "@/contexts/PlaylistContext";
@@ -7,7 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Dimensions,
   Share,
@@ -45,6 +46,7 @@ export default function PlayerScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const s = useMemo(() => makeStyles(colors), [colors]);
+  const [isPlaylistModalVisible, setIsPlaylistModalVisible] = useState(false);
 
   if (!currentSong) {
     return (
@@ -125,6 +127,13 @@ export default function PlayerScreen() {
             </Text>
           </View>
           <View style={{ flexDirection: "row", gap: Spacing.md }}>
+            <TouchableOpacity onPress={() => setIsPlaylistModalVisible(true)}>
+              <Ionicons
+                name="add-circle-outline"
+                size={28}
+                color={colors.onSurfaceVariant}
+              />
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => toggleDownload(currentSong)}>
               <Ionicons
                 name={downloaded ? "cloud-done" : "cloud-download-outline"}
@@ -219,6 +228,12 @@ export default function PlayerScreen() {
           </TouchableOpacity>
         </View>
       </View>
+
+      <AddToPlaylistModal
+        isVisible={isPlaylistModalVisible}
+        onClose={() => setIsPlaylistModalVisible(false)}
+        song={currentSong}
+      />
     </View>
   );
 }
