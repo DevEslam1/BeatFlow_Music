@@ -17,6 +17,8 @@ type TabType = 'Songs' | 'Artists' | 'Albums' | 'Folders';
 
 export default function LocalTracksScreen() {
   const [activeTab, setActiveTab] = useState<TabType>('Songs');
+  const [selectedGroupName, setSelectedGroupName] = useState<string | null>(null);
+  const [selectedGroupSongs, setSelectedGroupSongs] = useState<Song[] | null>(null);
   const { localSongs, albums, artists, folders, isLoading, permissionStatus, refreshLocalTracks } = useLocalTracks();
   const { playSong, isSongActive } = usePlayer();
   const insets = useSafeAreaInsets();
@@ -24,19 +26,71 @@ export default function LocalTracksScreen() {
   const navigation = useNavigation<any>();
   const s = useMemo(() => makeStyles(colors), [colors]);
 
-  const renderTabHeader = () => (
-    <View style={s.tabRow}>
-      {(['Songs', 'Artists', 'Albums', 'Folders'] as TabType[]).map((tab) => (
-        <TouchableOpacity 
-          key={tab} 
-          style={[s.tab, activeTab === tab && s.activeTab]} 
-          onPress={() => setActiveTab(tab)}
-        >
-          <Text style={[s.tabText, activeTab === tab && s.activeTabText]}>{tab}</Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-  );
+  const handleGroupPress = (name: string, songs: Song[]) => {
+    setSelectedGroupName(name);
+    setSelectedGroupSongs(songs);
+  };
+
+  const handleBack = () => {
+    if (selectedGroupName) {
+      setSelectedGroupName(null);
+      setSelectedGroupSongs(null);
+    } else {
+      navigation.openDrawer();
+    }
+  };
+
+  const renderTabHeader = () => {
+    if (selectedGroupName) return null;
+    return (
+      <View style={s.tabRow}>
+        {(['Songs', 'Artists', 'Albums', 'Folders'] as TabType[]).map((tab) => (
+          <TouchableOpacity 
+            key={tab} 
+            style={[s.tab, activeTab === tab && s.activeTab]} 
+            onPress={() => setActiveTab(tab)}
+          >
+            <Text style={[s.tabText, activeTab === tab && s.activeTabText]}>{tab}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    );
+  };
+
+  const renderDetailView = () => {
+    if (!selectedGroupName || !selectedGroupSongs) return null;
+
+    return (
+      <View style={{ flex: 1 }}>
+        <View style={s.detailHeader}>
+          <View style={s.detailInfo}>
+            <Text style={[s.detailTitle, { color: colors.onSurface }]}>{selectedGroupName}</Text>
+            <Text style={[s.detailSubtitle, { color: colors.onSurfaceVariant }]}>{selectedGroupSongs.length} songs</Text>
+          </View>
+          <TouchableOpacity 
+            style={s.playAllMini} 
+            onPress={() => playSong(selectedGroupSongs[0], selectedGroupSongs)}
+          >
+            <Ionicons name="play" size={20} color={colors.onPrimaryFixed} />
+            <Text style={s.playText}>Play All</Text>
+          </TouchableOpacity>
+        </View>
+        <FlatList
+          data={selectedGroupSongs}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 100 }}
+          renderItem={({ item, index }) => (
+            <SongItem 
+              song={item} 
+              index={index} 
+              isActive={isSongActive(item.id)}
+              onPress={() => playSong(item, selectedGroupSongs)} 
+            />
+          )}
+        />
+      </View>
+    );
+  };
 
   const renderEmptyState = () => (
     <View style={s.emptyContainer}>
@@ -60,10 +114,7 @@ export default function LocalTracksScreen() {
         renderItem={({ item }) => (
           <TouchableOpacity 
             style={s.groupItem} 
-            onPress={() => {
-              // Potential: Navigate to a filtered view or just play the first song
-              playSong(data[item][0], data[item]);
-            }}
+            onPress={() => handleGroupPress(item, data[item])}
           >
             <View style={s.groupIcon}>
               <Ionicons name={icon} size={24} color={colors.primary} />
@@ -82,12 +133,14 @@ export default function LocalTracksScreen() {
   return (
     <View style={[s.container, { paddingTop: insets.top }]}>
       <View style={s.header}>
-        <TouchableOpacity onPress={() => navigation.openDrawer()} style={s.backButton}>
-          <Ionicons name="menu" size={24} color={colors.onSurface} />
+        <TouchableOpacity onPress={handleBack} style={s.backButton}>
+          <Ionicons name={selectedGroupName ? "arrow-back" : "menu"} size={24} color={colors.onSurface} />
         </TouchableOpacity>
-        <Text style={[s.title, { color: colors.onSurface }]}>Local Library</Text>
+        <Text style={[s.title, { color: colors.onSurface }]}>
+          {selectedGroupName ? activeTab.slice(0, -1) : 'Local Library'}
+        </Text>
         <TouchableOpacity onPress={refreshLocalTracks} style={s.backButton}>
-          <Ionicons name="sync" size={20} color={colors.primary} />
+          <Ionicons name={selectedGroupName ? "shuffle" : "sync"} size={20} color={colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -100,25 +153,31 @@ export default function LocalTracksScreen() {
         </View>
       ) : (
         <View style={{ flex: 1 }}>
-          {activeTab === 'Songs' && (
-            <FlatList
-              data={localSongs}
-              keyExtractor={(item) => item.id}
-              contentContainerStyle={{ paddingBottom: 100 }}
-              renderItem={({ item, index }) => (
-                <SongItem 
-                  song={item} 
-                  index={index} 
-                  isActive={isSongActive(item.id)}
-                  onPress={() => playSong(item, localSongs)} 
+          {selectedGroupName ? (
+            renderDetailView()
+          ) : (
+            <View style={{ flex: 1 }}>
+              {activeTab === 'Songs' && (
+                <FlatList
+                  data={localSongs}
+                  keyExtractor={(item) => item.id}
+                  contentContainerStyle={{ paddingBottom: 100 }}
+                  renderItem={({ item, index }) => (
+                    <SongItem 
+                      song={item} 
+                      index={index} 
+                      isActive={isSongActive(item.id)}
+                      onPress={() => playSong(item, localSongs)} 
+                    />
+                  )}
+                  ListEmptyComponent={renderEmptyState()}
                 />
               )}
-              ListEmptyComponent={renderEmptyState()}
-            />
+              {activeTab === 'Artists' && renderGroupList(artists, 'person-outline')}
+              {activeTab === 'Albums' && renderGroupList(albums, 'disc-outline')}
+              {activeTab === 'Folders' && renderGroupList(folders, 'folder-open-outline')}
+            </View>
           )}
-          {activeTab === 'Artists' && renderGroupList(artists, 'person-outline')}
-          {activeTab === 'Albums' && renderGroupList(albums, 'disc-outline')}
-          {activeTab === 'Folders' && renderGroupList(folders, 'folder-open-outline')}
         </View>
       )}
     </View>
@@ -163,4 +222,28 @@ const makeStyles = (c: ColorPalette) => StyleSheet.create({
   groupInfo: { flex: 1 },
   groupName: { fontSize: FontSizes.bodyLg, fontWeight: '600' },
   groupCount: { fontSize: FontSizes.labelSm, marginTop: 2 },
+  detailHeader: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'space-between', 
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.lg,
+    backgroundColor: c.surfaceContainerLow,
+    marginHorizontal: Spacing.xl,
+    borderRadius: Radii.xl,
+    marginBottom: Spacing.md
+  },
+  detailInfo: { flex: 1 },
+  detailTitle: { fontSize: FontSizes.titleLg, fontWeight: 'bold' },
+  detailSubtitle: { fontSize: FontSizes.labelMd, marginTop: 2 },
+  playAllMini: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: c.primary, 
+    paddingHorizontal: Spacing.lg, 
+    paddingVertical: Spacing.sm, 
+    borderRadius: Radii.full,
+    gap: Spacing.xs
+  },
+  playText: { color: c.onPrimaryFixed, fontWeight: '600', fontSize: FontSizes.labelMd },
 });
