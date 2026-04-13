@@ -30,12 +30,14 @@ The goal of this project is to show practical mobile engineering skills:
 
 ## What The App Does
 
-- Streams 30-second Deezer previews with play, pause, seek, skip, shuffle, and repeat controls
-- Shows a persistent mini player across the main app
-- Supports favorites, playlists, recent tracks, and downloads
-- Detects connectivity and blocks online playback while offline
-- Scans local device audio files and lets users play them inside the same player experience
-- Supports light, dark, and system theme modes
+- **Advanced Playback**: Streams Deezer previews with play, pause, seek, skip, shuffle, and repeat controls.
+- **Background Audio**: Sustained background playback on Android and iOS with native system integration.
+- **System Media Controls**: Support for lock screen and notification drawer controls (Now Playing metadata).
+- **Persistent Mini Player**: Seamless music control while navigating the entire app.
+- **Library Management**: Supports favorites, custom playlists, recently played tracks, and downloads.
+- **Offline Mode**: Detects connectivity and automatically switches to playing downloaded local content.
+- **Local Media Scanning**: Scans device audio files to merge local and online libraries in one player experience.
+- **Theming**: Fully theme-aware UI (Light, Dark, and System modes).
 
 ## Tech Stack
 
@@ -67,23 +69,23 @@ This structure keeps UI, business logic, and shared state separated well enough 
 
 ## Key Engineering Areas
 
-### Playback
+### Playback & Background Tasks
 
-- Queue-based playback with current track state, seeking, repeat, and shuffle
-- Shared player state across screens through `PlayerContext`
-- Background audio support configured for mobile playback use cases
+- **Sustained Playback**: Implements `AudioControlsService` on Android and `UIBackgroundModes` on iOS to ensure the OS doesn't kill playback while in the background.
+- **Lock Screen Integration**: Leverages `setActiveForLockScreen` (SDK 55 ready) to provide native Now Playing metadata and system-level media controls.
+- **Queue Management**: Shared player state across screens through `PlayerContext`, handling dynamic queueing, seeking, and cross-screen synchronization.
 
 ### Offline And Local Media
 
-- Offline mode detection using NetInfo
-- Downloaded audio playback from local storage
-- Device media scanning and classification for local tracks
+- **Intelligent Connectivity**: Offline mode detection using NetInfo with automatic fallback to local assets.
+- **Persistent Storage**: Downloaded audio management using `expo-file-system` and metadata persistence with Async Storage.
+- **Media Mapping**: Device media scanning and classification to integrate local tracks into the player's unified data model.
 
-### UI And Navigation
+### UI Architecture
 
-- Drawer plus bottom tabs plus stack navigation
-- Theme-aware styling across screens
-- Mini player that stays visible while users move through the app
+- **Complex Navigation**: Nested navigation architecture involving Drawer, Bottom Tabs, and Native Stacks.
+- **Design System**: Centralized `ThemeContext` providing dynamic design tokens for a consistent "premium" look.
+- **Performance**: Optimized mini-player and list rendering to ensure smooth interaction during playback.
 
 ## Current Product Scope
 
@@ -92,8 +94,6 @@ This is a portfolio project, not a production service. A few parts are intention
 - Authentication is local/demo-oriented rather than backed by a real auth provider
 - Streaming uses Deezer preview URLs, not full licensed playback
 - The project currently focuses more on mobile product quality than backend depth
-
-Being explicit about that scope makes the repo more credible than pretending it is already production-ready.
 
 ## Getting Started
 
@@ -111,17 +111,19 @@ cd BeatFlow
 npm install
 ```
 
-### Run
+### Build & Run
+*Note: Because this app uses native background services and custom permissions, it requires a Development Build or local compilation (not standard Expo Go).*
 
 ```bash
-npm run start
+# Prebuild native directories
+npx expo prebuild
+
+# Run on Android
+npm run android
+
+# Run on iOS
+npm run ios
 ```
-
-Then launch one of:
-
-- `npm run android`
-- `npm run ios`
-- `npm run web`
 
 ## API
 
@@ -141,23 +143,6 @@ Main endpoints used:
 - Add CI for linting and test execution
 - Reduce Android permissions to the minimum required set
 - Remove leftover template files and unused dependencies
-
-## Project Structure
-
-```text
-BeatFlow/
-|-- screens/
-|-- components/
-|-- contexts/
-|-- navigation/
-|-- services/
-|-- constants/
-|-- assets/
-|-- ss/
-|-- App.tsx
-|-- app.json
-`-- package.json
-```
 
 ## Contact
 
