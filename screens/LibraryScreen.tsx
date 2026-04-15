@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, FlatList,
-  ActivityIndicator, TextInput,
+  TextInput,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Spacing, Radii, FontSizes, ColorPalette } from '@/constants/theme';
 import { Song } from '@/services/types';
-import { getChart } from '@/services/api';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { usePlaylist } from '@/contexts/PlaylistContext';
 import { useNetwork } from '@/contexts/NetworkContext';
@@ -17,15 +16,13 @@ import { TabScreenNavProp } from '@/navigation/types';
 import SongItem from '@/components/SongItem';
 import SwipeableItem from '@/components/SwipeableItem';
 
-const TABS = ['Songs', 'Playlists', 'Favorites', 'Downloads'];
+const TABS = ['Recent', 'Playlists', 'Favorites', 'Downloads'];
 
 export default function LibraryScreen() {
-  const [activeTab, setActiveTab] = useState('Songs');
-  const [songs, setSongs] = useState<Song[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('Recent');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'artist'>('name');
-  const { playSong, isSongActive } = usePlayer();
+  const { playSong, isSongActive, recentlyPlayed } = usePlayer();
   const { 
     playlists, favorites, downloads, 
     toggleFavorite, toggleDownload, deletePlaylist 
@@ -48,7 +45,7 @@ export default function LibraryScreen() {
   const availableTabs = useMemo(() => {
     if (!isOffline) return TABS;
     return TABS.filter(tab => {
-      if (tab === 'Songs') return false;
+      if (tab === 'Recent') return false;
       if (tab === 'Playlists') return hasDownloadedPlaylists;
       if (tab === 'Favorites') return hasDownloadedFavorites;
       return true; // Always show Downloads when offline
@@ -61,15 +58,7 @@ export default function LibraryScreen() {
     }
   }, [isOffline, activeTab, availableTabs]);
 
-  useEffect(() => { loadSongs(); }, []);
-
-  const loadSongs = async () => {
-    try { const chartSongs = await getChart(); setSongs(chartSongs); }
-    catch (e) { console.error(e); }
-    setLoading(false);
-  };
-
-  const filteredSongs = songs
+  const filteredSongs = recentlyPlayed
     .filter((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase()) || item.artist.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => sortBy === 'name' ? a.name.localeCompare(b.name) : a.artist.localeCompare(b.artist));
 
@@ -120,29 +109,36 @@ export default function LibraryScreen() {
         ))}
       </View>
 
-      {activeTab === 'Songs' && (
+      {activeTab === 'Recent' && (
         <>
-          <View style={s.actionRow}>
-            <TouchableOpacity style={s.sortButton} onPress={() => setSortBy(sortBy === 'name' ? 'artist' : 'name')}>
-              <Ionicons name="swap-vertical" size={18} color={colors.primary} />
-              <Text style={s.sortText}>Sort: {sortBy === 'name' ? 'Name' : 'Artist'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={s.shuffleButton} onPress={handleShuffleAll}>
-              <Ionicons name="shuffle" size={18} color={colors.onPrimaryFixed} />
-              <Text style={s.shuffleText}>Shuffle All</Text>
-            </TouchableOpacity>
-          </View>
-          {loading ? <ActivityIndicator color={colors.primary} style={s.loader} /> : (
-            <FlatList data={filteredSongs} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingBottom: 180 }}
-              renderItem={({ item, index }) => (
-                <SongItem 
-                  song={item} 
-                  index={index} 
-                  isActive={isSongActive(item.id)}
-                  onPress={() => playSong(item, filteredSongs)} 
-                />
-              )} />
+          {filteredSongs.length > 0 && (
+            <View style={s.actionRow}>
+              <TouchableOpacity style={s.sortButton} onPress={() => setSortBy(sortBy === 'name' ? 'artist' : 'name')}>
+                <Ionicons name="swap-vertical" size={18} color={colors.primary} />
+                <Text style={s.sortText}>Sort: {sortBy === 'name' ? 'Name' : 'Artist'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={s.shuffleButton} onPress={handleShuffleAll}>
+                <Ionicons name="shuffle" size={18} color={colors.onPrimaryFixed} />
+                <Text style={s.shuffleText}>Shuffle All</Text>
+              </TouchableOpacity>
+            </View>
           )}
+          <FlatList 
+            data={filteredSongs} 
+            keyExtractor={(item) => `recent-${item.id}`} 
+            contentContainerStyle={{ paddingBottom: 180 }}
+            renderItem={({ item, index }) => (
+              <SongItem 
+                song={item} 
+                index={index} 
+                isActive={isSongActive(item.id)}
+                onPress={() => playSong(item, filteredSongs)} 
+              />
+            )}
+            ListEmptyComponent={
+              <Text style={s.emptyText}>No recently played songs.</Text>
+            }
+          />
         </>
       )}
 
@@ -229,6 +225,7 @@ export default function LibraryScreen() {
 }
 
 const makeStyles = (c: ColorPalette) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: c.background },
   header: { 
     flexDirection: 'row', 
     alignItems: 'center', 

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, FlatList,
-  ActivityIndicator, ScrollView, Image,
+  ActivityIndicator, ScrollView, Image, Linking,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,7 +20,10 @@ export default function LocalTracksScreen() {
   const [activeTab, setActiveTab] = useState<TabType>('Songs');
   const [selectedGroupName, setSelectedGroupName] = useState<string | null>(null);
   const [selectedGroupSongs, setSelectedGroupSongs] = useState<Song[] | null>(null);
-  const { localSongs, albums, artists, folders, isLoading, permissionStatus, refreshLocalTracks } = useLocalTracks();
+  const { 
+    localSongs, albums, artists, folders, 
+    isLoading, permissionStatus, canAskAgain, refreshLocalTracks 
+  } = useLocalTracks();
   const { playSong, isSongActive } = usePlayer();
   const { isOffline, isConnected, isOfflineModeEnabled, toggleOfflineMode } = useNetwork();
   const insets = useSafeAreaInsets();
@@ -97,17 +100,34 @@ export default function LocalTracksScreen() {
     );
   };
 
-  const renderEmptyState = () => (
-    <View style={s.emptyContainer}>
-      <Ionicons name="musical-notes-outline" size={64} color={colors.onSurfaceVariant} />
-      <Text style={[s.emptyText, { color: colors.onSurface }]}>
-        {permissionStatus === 'granted' ? 'No local music found.' : 'Permission needed to scan library.'}
-      </Text>
-      <TouchableOpacity style={s.refreshButton} onPress={refreshLocalTracks}>
-        <Text style={s.refreshButtonText}>Scan Now</Text>
-      </TouchableOpacity>
-    </View>
-  );
+  const renderEmptyState = () => {
+    const isPermanentlyDenied = permissionStatus === 'denied' && !canAskAgain;
+    
+    return (
+      <View style={s.emptyContainer}>
+        <Ionicons 
+          name={isPermanentlyDenied ? "settings-outline" : "musical-notes-outline"} 
+          size={64} 
+          color={colors.onSurfaceVariant} 
+        />
+        <Text style={[s.emptyText, { color: colors.onSurface }]}>
+          {permissionStatus === 'granted' 
+            ? 'No local music found.' 
+            : isPermanentlyDenied
+              ? 'Permission to access your library is permanently denied. Please enable it in Settings to listen to your local files.'
+              : 'Permission needed to scan library.'}
+        </Text>
+        <TouchableOpacity 
+          style={s.refreshButton} 
+          onPress={isPermanentlyDenied ? () => Linking.openSettings() : refreshLocalTracks}
+        >
+          <Text style={s.refreshButtonText}>
+            {isPermanentlyDenied ? 'Open Settings' : 'Scan Now'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   const renderGroupList = (data: Record<string, Song[]>, icon: any) => {
     const keys = Object.keys(data).sort();

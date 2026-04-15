@@ -9,6 +9,7 @@ interface LocalTracksContextType {
   folders: Record<string, Song[]>;
   isLoading: boolean;
   permissionStatus: MediaLibrary.PermissionStatus | null;
+  canAskAgain: boolean;
   refreshLocalTracks: () => Promise<void>;
 }
 
@@ -21,21 +22,24 @@ export function LocalTracksProvider({ children }: { children: React.ReactNode })
   const [folders, setFolders] = useState<Record<string, Song[]>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [permissionStatus, setPermissionStatus] = useState<MediaLibrary.PermissionStatus | null>(null);
+  const [canAskAgain, setCanAskAgain] = useState(true);
 
   const scanLocalDevice = useCallback(async () => {
     setIsLoading(true);
     try {
       let status: MediaLibrary.PermissionStatus;
-      
-      const { status: currentStatus, canAskAgain } = await MediaLibrary.getPermissionsAsync();
+      const { status: currentStatus, canAskAgain: initialCanAskAgain } = await MediaLibrary.getPermissionsAsync();
       status = currentStatus;
-
-      if (status !== 'granted' && canAskAgain) {
-        const { status: requestedStatus } = await MediaLibrary.requestPermissionsAsync();
+      let finalCanAskAgain = initialCanAskAgain;
+      
+      if (status !== 'granted' && initialCanAskAgain) {
+        const { status: requestedStatus, canAskAgain: requestedCanAskAgain } = await MediaLibrary.requestPermissionsAsync();
         status = requestedStatus;
+        finalCanAskAgain = requestedCanAskAgain;
       }
       
       setPermissionStatus(status);
+      setCanAskAgain(finalCanAskAgain);
 
       if (status !== 'granted') {
         console.log('Media Library permission not granted:', status);
@@ -119,6 +123,7 @@ export function LocalTracksProvider({ children }: { children: React.ReactNode })
         folders,
         isLoading,
         permissionStatus,
+        canAskAgain,
         refreshLocalTracks: scanLocalDevice,
       }}
     >

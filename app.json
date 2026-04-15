@@ -15,7 +15,8 @@
         "UIBackgroundModes": [
           "audio"
         ],
-        "NSPhotoLibraryUsageDescription": "BeatFlow needs access to your local music to build your library."
+        "NSPhotoLibraryUsageDescription": "BeatFlow needs access to your local music to build your library.",
+        "NSPhotoLibraryAddUsageDescription": "Allow BeatFlow to save music files to your library."
       }
     },
     "android": {
