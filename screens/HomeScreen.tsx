@@ -241,9 +241,9 @@ export default function HomeScreen() {
             renderItem={({ item }) => {
               const available = !isOffline || isDownloaded(item.id);
               return (
-                <TouchableOpacity 
-                  style={[s.favItem, !available && { opacity: 0.38 }]} 
-                  onPress={() => available && playSong(item, favorites)}
+                <TouchableOpacity
+                  style={[s.favItem, !available && { opacity: 0.38 }]}
+                  onPress={() => available && playSong(item, displayedFavorites)}
                   disabled={!available}
                 >
                   <View>

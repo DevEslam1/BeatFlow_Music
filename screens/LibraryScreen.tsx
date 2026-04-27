@@ -33,9 +33,14 @@ export default function LibraryScreen() {
   const { isOffline, isConnected, isOfflineModeEnabled, toggleOfflineMode } = useNetwork();
   const s = useMemo(() => makeStyles(colors), [colors]);
 
-  const hasDownloadedFavorites = useMemo(() => 
-    favorites.some(s => downloads.some(d => d.id === s.id)), 
-    [favorites, downloads]
+  const visibleFavorites = useMemo(
+    () => (isOffline ? favorites.filter(s => downloads.some(d => d.id === s.id)) : favorites),
+    [isOffline, favorites, downloads]
+  );
+
+  const hasDownloadedFavorites = useMemo(() =>
+    visibleFavorites.length > 0,
+    [visibleFavorites]
   );
   const hasDownloadedPlaylists = useMemo(() => 
     playlists.some(p => p.songs.some(s => downloads.some(d => d.id === s.id))), 
@@ -168,12 +173,15 @@ export default function LibraryScreen() {
       )}
 
       {activeTab === 'Favorites' && (
-        <FlatList data={isOffline ? favorites.filter(s => downloads.some(d => d.id === s.id)) : favorites} keyExtractor={(item) => item.id}
+        <FlatList data={visibleFavorites} keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingBottom: 180 }}
-          ListHeaderComponent={favorites.length > 0 ? (
+          ListHeaderComponent={visibleFavorites.length > 0 ? (
             <View style={s.favHeader}>
               <TouchableOpacity style={s.shuffleButton} onPress={() => {
-                if (favorites.length > 0) { const i = Math.floor(Math.random() * favorites.length); playSong(favorites[i], favorites); }
+                if (visibleFavorites.length > 0) {
+                  const i = Math.floor(Math.random() * visibleFavorites.length);
+                  playSong(visibleFavorites[i], visibleFavorites);
+                }
               }}>
                 <Ionicons name="shuffle" size={18} color={colors.onPrimaryFixed} />
                 <Text style={s.shuffleText}>Shuffle</Text>
@@ -182,11 +190,11 @@ export default function LibraryScreen() {
           ) : null}
           renderItem={({ item, index }) => (
             <SwipeableItem onDelete={() => toggleFavorite(item)}>
-              <SongItem 
-                song={item} 
-                index={index} 
+              <SongItem
+                song={item}
+                index={index}
                 isActive={isSongActive(item.id)}
-                onPress={() => playSong(item, favorites)} 
+                onPress={() => playSong(item, visibleFavorites)}
               />
             </SwipeableItem>
           )}

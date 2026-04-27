@@ -115,7 +115,7 @@ export default function AddToPlaylistModal({ isVisible, onClose, song }: AddToPl
                 )}
                 ListEmptyComponent={
                   <View style={s.emptyState}>
-                    <Text style={s.emptyText}>You haven't created any playlists yet.</Text>
+                    <Text style={s.emptyText}>You have not created any playlists yet.</Text>
                   </View>
                 }
                 contentContainerStyle={s.listPadding}

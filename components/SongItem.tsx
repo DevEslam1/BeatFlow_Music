@@ -34,8 +34,10 @@ export default function SongItem({
   const liked = isFavorite(song.id);
   const downloaded = isDownloaded(song.id);
   const isPlaying = isActive && playerIsPlaying;
-  
-  const isDisabled = isOffline && !downloaded;
+
+  const isLocalTrack = song.id.startsWith('local-') || song.previewUrl.startsWith('file://');
+  const isOfflinePlayable = downloaded || isLocalTrack;
+  const isDisabled = isOffline && !isOfflinePlayable;
   
   const styles = useMemo(() => makeStyles(colors), [colors]);
 

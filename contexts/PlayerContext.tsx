@@ -134,17 +134,80 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     };
   }, [cleanupPlayer]);
 
-  const loadAndPlay = useCallback(async (song: Song, index: number) => {
-    try {
-      let urlToPlay = song.previewUrl;
+  const resolvePlaybackUrl = useCallback((song: Song) => {
+    const downloadedSong = downloadsRef.current.find((s) => s.id === song.id);
+    if (downloadedSong) {
+      return downloadedSong.previewUrl;
+    }
+    return song.previewUrl;
+  }, []);
 
-      // Substitute with local file if downloaded
-      const downloadedSong = downloadsRef.current.find((s) => s.id === song.id);
-      if (downloadedSong) {
-        urlToPlay = downloadedSong.previewUrl;
+  const isSongPlayableOffline = useCallback((song: Song) => {
+    if (song.id.startsWith('local-')) {
+      return true;
+    }
+    return resolvePlaybackUrl(song).startsWith('file://');
+  }, [resolvePlaybackUrl]);
+
+  const isSongPlayableNow = useCallback((song: Song) => {
+    if (!isOfflineRef.current) {
+      return true;
+    }
+    return isSongPlayableOffline(song);
+  }, [isSongPlayableOffline]);
+
+  const filterQueueForCurrentMode = useCallback((songs: Song[]) => {
+    if (!isOfflineRef.current) {
+      return songs;
+    }
+    return songs.filter(isSongPlayableNow);
+  }, [isSongPlayableNow]);
+
+  const findNextPlayableIndex = useCallback((
+    currentIndex: number,
+    songs: Song[],
+    direction: 1 | -1,
+    allowWrap: boolean,
+    useShuffle = false
+  ) => {
+    if (songs.length === 0) {
+      return -1;
+    }
+
+    if (useShuffle) {
+      for (let i = 0; i < songs.length; i += 1) {
+        const randomIndex = Math.floor(Math.random() * songs.length);
+        if (isSongPlayableNow(songs[randomIndex])) {
+          return randomIndex;
+        }
+      }
+      return -1;
+    }
+
+    for (let offset = 1; offset <= songs.length; offset += 1) {
+      let candidate = currentIndex + direction * offset;
+
+      if (!allowWrap && (candidate < 0 || candidate >= songs.length)) {
+        return -1;
       }
 
-      if (isOfflineRef.current && !urlToPlay.startsWith('file://')) {
+      if (allowWrap) {
+        candidate = ((candidate % songs.length) + songs.length) % songs.length;
+      }
+
+      if (isSongPlayableNow(songs[candidate])) {
+        return candidate;
+      }
+    }
+
+    return -1;
+  }, [isSongPlayableNow]);
+
+  const loadAndPlay = useCallback(async (song: Song, index: number) => {
+    try {
+      const urlToPlay = resolvePlaybackUrl(song);
+
+      if (isOfflineRef.current && !isSongPlayableOffline(song)) {
         Alert.alert(
           'Offline Mode',
           'This song is not downloaded. Please connect to the internet or play downloaded songs from your library.'
@@ -187,7 +250,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error loading audio:', error);
     }
-  }, [ensurePlayer]);
+  }, [ensurePlayer, isSongPlayableOffline, resolvePlaybackUrl]);
 
   const handleSongFinish = useCallback(async () => {
     const player = playerRef.current;
@@ -204,26 +267,31 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
 
     const currentQueue = queueRef.current;
-    let nextIndex = queueIndexRef.current + 1;
-
-    if (shuffleRef.current && currentQueue.length > 0) {
-      nextIndex = Math.floor(Math.random() * currentQueue.length);
+    if (currentQueue.length === 0) {
+      setIsPlaying(false);
+      return;
     }
 
-    if (nextIndex >= currentQueue.length) {
-      if (repeatRef.current === 'all') {
-        nextIndex = 0;
-      } else {
-        setIsPlaying(false);
-        return;
-      }
+    const useShuffle = shuffleRef.current;
+    const allowWrap = useShuffle || repeatRef.current === 'all';
+    const nextIndex = findNextPlayableIndex(
+      queueIndexRef.current,
+      currentQueue,
+      1,
+      allowWrap,
+      useShuffle
+    );
+
+    if (nextIndex === -1) {
+      setIsPlaying(false);
+      return;
     }
 
     const nextSong = currentQueue[nextIndex];
     if (nextSong) {
       await loadAndPlay(nextSong, nextIndex);
     }
-  }, [loadAndPlay]);
+  }, [findNextPlayableIndex, loadAndPlay]);
 
   useEffect(() => {
     handleSongFinishRef.current = handleSongFinish;
@@ -237,17 +305,32 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (songList && songList.length > 0) {
-      queueRef.current = songList;
-      setQueue(songList);
-      const index = songList.findIndex((s) => s.id === song.id);
-      await loadAndPlay(song, index >= 0 ? index : 0);
+      const nextQueue = filterQueueForCurrentMode(songList);
+      queueRef.current = nextQueue;
+      setQueue(nextQueue);
+
+      const index = nextQueue.findIndex((s) => s.id === song.id);
+      if (index === -1) {
+        await loadAndPlay(song, 0);
+        return;
+      }
+
+      await loadAndPlay(song, index);
     } else {
       const existingIndex = queueRef.current.findIndex((s) => s.id === song.id);
       if (existingIndex === -1) {
-        const newQueue = [...queueRef.current, song];
-        queueRef.current = newQueue;
-        setQueue(newQueue);
-        await loadAndPlay(song, newQueue.length - 1);
+        const candidateQueue = [...queueRef.current, song];
+        const nextQueue = filterQueueForCurrentMode(candidateQueue);
+        queueRef.current = nextQueue;
+        setQueue(nextQueue);
+
+        const index = nextQueue.findIndex((s) => s.id === song.id);
+        if (index === -1) {
+          await loadAndPlay(song, 0);
+          return;
+        }
+
+        await loadAndPlay(song, index);
       } else {
         await loadAndPlay(song, existingIndex);
       }
@@ -278,14 +361,23 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   const skipNext = async () => {
     const currentQueue = queueRef.current;
-    let nextIndex = queueIndexRef.current + 1;
-
-    if (shuffleRef.current && currentQueue.length > 0) {
-      nextIndex = Math.floor(Math.random() * currentQueue.length);
+    if (currentQueue.length === 0) {
+      setIsPlaying(false);
+      return;
     }
 
-    if (nextIndex >= currentQueue.length) {
-      nextIndex = 0;
+    const useShuffle = shuffleRef.current;
+    const nextIndex = findNextPlayableIndex(
+      queueIndexRef.current,
+      currentQueue,
+      1,
+      true,
+      useShuffle
+    );
+
+    if (nextIndex === -1) {
+      setIsPlaying(false);
+      return;
     }
 
     const nextSong = currentQueue[nextIndex];
@@ -303,9 +395,21 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    let prevIndex = queueIndexRef.current - 1;
-    if (prevIndex < 0) {
-      prevIndex = currentQueue.length - 1;
+    if (currentQueue.length === 0) {
+      setIsPlaying(false);
+      return;
+    }
+
+    const prevIndex = findNextPlayableIndex(
+      queueIndexRef.current,
+      currentQueue,
+      -1,
+      true
+    );
+
+    if (prevIndex === -1) {
+      setIsPlaying(false);
+      return;
     }
 
     const previousSong = currentQueue[prevIndex];

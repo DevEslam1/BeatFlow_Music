@@ -4,13 +4,13 @@ import Animated from 'react-native-reanimated';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-const AnimatedImage = Animated.createAnimatedComponent(Image);
 import { Radii, Spacing, FontSizes, ColorPalette } from '@/constants/theme';
 import { usePlayer } from '@/contexts/PlayerContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useNavigationStateContext } from '@/contexts/NavigationContext';
 import { navigationRef } from '@/navigation/RootNavigation';
+
+const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 export default function MiniPlayer() {
   const { currentSong, isPlaying, togglePlayPause, position, duration } = usePlayer();
